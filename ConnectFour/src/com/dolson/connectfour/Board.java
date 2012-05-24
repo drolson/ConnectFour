@@ -151,33 +151,37 @@ public class Board extends View implements OnClickListener
 	@Override
 	public boolean onTouchEvent(MotionEvent me)
 	{
-		int xloc = (int)me.getX();
-		space = (int)(xloc/diameter);
-		System.out.println("space: " + space);	
-		
-		int eventaction = me.getAction();
-		switch (eventaction)
+		//if a token is already being dropped, dont let the person change while its dropping
+		if (dropToken)
 		{
-		case MotionEvent.ACTION_DOWN:
-			System.out.println("there was a press down");
-			placeChecker = space;
-			break;
-		case MotionEvent.ACTION_MOVE:
-			System.out.println("there was some movement");
-			//recalc, but dont have to do anything but draw if it chages the space
-			if (oldSpace != space)
+			int xloc = (int)me.getX();
+			space = (int)(xloc/diameter);
+			System.out.println("space: " + space);	
+			
+			int eventaction = me.getAction();
+			switch (eventaction)
+			{
+			case MotionEvent.ACTION_DOWN:
+				System.out.println("there was a press down");
 				placeChecker = space;
-			break;
-		case MotionEvent.ACTION_UP:
-			System.out.println("we released the pressing");
-			placeChecker = -1;
-			dropToken = true;
-			yValue = 7;
-			break;
+				break;
+			case MotionEvent.ACTION_MOVE:
+				System.out.println("there was some movement");
+				//recalc, but dont have to do anything but draw if it chages the space
+				if (oldSpace != space)
+					placeChecker = space;
+				break;
+			case MotionEvent.ACTION_UP:
+				System.out.println("we released the pressing");
+				placeChecker = -1;
+				dropToken = true;
+				yValue = 7;
+				break;
+			}
+			
+			oldSpace = space;
+			this.invalidate();
 		}
-		
-		oldSpace = space;
-		this.invalidate();
 		return true;
 	}
 
