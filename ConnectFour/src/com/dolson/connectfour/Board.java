@@ -16,6 +16,10 @@ public class Board extends View implements OnClickListener
 	private float diameter;
 	private int space = -1;
 	private int oldSpace;
+	private int turn = 0;
+	private final float dropSpeed = (float)0.25;
+	private float yValue;
+	private boolean dropToken = false;
 	
 	
 	public Board(Context context)
@@ -24,7 +28,7 @@ public class Board extends View implements OnClickListener
 		board = new int[6][7];
 			for (int i = 0; i < board.length; i++)
 				for (int j = 0; j < board[0].length; j++)
-					board[i][j] = 0;
+					board[i][j] = -1;
 	}
 
 	@Override
@@ -45,11 +49,11 @@ public class Board extends View implements OnClickListener
 	    		// if board = 1 > red
 	    		//if board = 2 > black
 	    		//if board = 0 > white
-	    		if (board[6-row][i] == 0)
+	    		if (board[6-row][i] == -1)
 	    			paint.setColor(Color.WHITE);
-	    		else if (board[6-row][i] == 1)
+	    		else if (board[6-row][i] == 0)
 	    			paint.setColor(Color.RED);
-	    		else if (board[6-row][i] == 2)
+	    		else if (board[6-row][i] == 1)
 	    			paint.setColor(Color.BLACK);
 	    		
 	    		canvas.drawCircle((i*diameter)+(radius)+spacing, (this.getHeight()-(diameter*row))+radius, radius, paint);
@@ -57,21 +61,53 @@ public class Board extends View implements OnClickListener
 	    	}
 	    }
 	    
+	    //this will draw the checker that hasnt been dropped but will be when button released
+	    if (turn == 0)
+    		paint.setColor(Color.RED);
+    	else
+    		paint.setColor(Color.BLACK);
+	    
 	    if (placeChecker != -1)
 	    {
-	    	System.out.println("THIS IS WHERE WE DRAW THE CHECKER");
-	    	paint.setColor(Color.RED);
+	    	/*if (turn == 0)
+	    		paint.setColor(Color.RED);
+	    	else
+	    		paint.setColor(Color.BLACK);*/
+	    	
+	    	
 	    	canvas.drawCircle((placeChecker*diameter)+(radius)+spacing, (this.getHeight()-(diameter*7))+radius, radius, paint);
 	    }
+	    
+	    if (dropToken)
+	    {
+	    	
+	    	//while (dropToken)
+	    	//{
+	    		//System.out.println(placeChecker + "       " + yValue);
+	    		canvas.drawCircle((space*diameter)+(radius)+spacing, (this.getHeight()-(diameter*yValue))+radius, radius, paint);
+	    		
+	    		System.out.println("Drop speed:  " + yValue + "     " + (board.length-1-findYValue(space)));
+	    		
+	    		if (yValue <= (board.length-findYValue(space)))
+	    		{
+	    			insert(space, turn);
+	    			turn = (turn+1)%2;
+	    			dropToken = false;
+	    		}
+	    		yValue = yValue - dropSpeed;
+	    		this.invalidate();
+	    	//}
+	    }
+	    
 	    
 	}
 	
 
-	protected void insert(int col, int player)
+	private void insert(int col, int player)
 	{
-		for (int i = board.length-1; i >= 0; i++)
+		for (int i = board.length-1; i >= 0; i--)
 		{
-			if (board[i][col] == 0) //then empty space
+			if (board[i][col] == -1) //then empty space
 			{
 				board[i][col] = player;
 				break;
@@ -135,6 +171,8 @@ public class Board extends View implements OnClickListener
 		case MotionEvent.ACTION_UP:
 			System.out.println("we released the pressing");
 			placeChecker = -1;
+			dropToken = true;
+			yValue = 7;
 			break;
 		}
 		
@@ -143,6 +181,27 @@ public class Board extends View implements OnClickListener
 		return true;
 	}
 
+	/*private void placeChecker()
+	{
+		for (int i = 5; i <= 0; i++)
+		{
+			if (board[space][i] == -1)
+				board[space][i] = turn;
+		}
+	}*/
+	
+	private int findYValue(int col)
+	{
+		for (int i = board.length-1; i >= 0; i--)
+		{
+			if (board[i][col] == -1) //then empty space
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+	
 	@Override
 	public void onClick(View v)
 	{
