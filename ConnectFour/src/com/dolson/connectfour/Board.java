@@ -14,7 +14,9 @@ public class Board extends View implements OnClickListener
 	private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 	private int placeChecker = -1;
 	private float diameter;
-	private int space;
+	private int space = -1;
+	private int oldSpace;
+	
 	
 	public Board(Context context)
 	{
@@ -28,13 +30,13 @@ public class Board extends View implements OnClickListener
 	@Override
 	protected void onDraw(Canvas canvas) {
 	    super.onDraw(canvas);
-	 
+	    //System.out.println("thius is an updated view");
 	    diameter = this.getWidth()/7;
 	    //System.out.println(this.getWidth());
 	    float radius = diameter/2;
 	    //System.out.println(this.getHeight());
 	    float spacing = (this.getWidth() - (diameter)*(float)7)/6;
-	    System.out.println(spacing);
+	    //System.out.println(spacing);
 	    
 	    for (int row = 1; row <= 6; row++)
 	    {
@@ -42,7 +44,7 @@ public class Board extends View implements OnClickListener
 	    	{
 	    		// if board = 1 > red
 	    		//if board = 2 > black
-	    		//if board = 0 >white
+	    		//if board = 0 > white
 	    		if (board[6-row][i] == 0)
 	    			paint.setColor(Color.WHITE);
 	    		else if (board[6-row][i] == 1)
@@ -52,9 +54,16 @@ public class Board extends View implements OnClickListener
 	    		
 	    		canvas.drawCircle((i*diameter)+(radius)+spacing, (this.getHeight()-(diameter*row))+radius, radius, paint);
 	    		
-	    		    		
 	    	}
 	    }
+	    
+	    if (placeChecker != -1)
+	    {
+	    	System.out.println("THIS IS WHERE WE DRAW THE CHECKER");
+	    	paint.setColor(Color.RED);
+	    	canvas.drawCircle((placeChecker*diameter)+(radius)+spacing, (this.getHeight()-(diameter*7))+radius, radius, paint);
+	    }
+	    
 	}
 	
 
@@ -101,22 +110,44 @@ public class Board extends View implements OnClickListener
 		return s;
 	}
 
-	@Override
-	public void onClick(View v)
-	{
-		
-		
-	}
+	
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent me)
 	{
 		int xloc = (int)me.getX();
 		space = (int)(xloc/diameter);
-		System.out.println(space);
+		System.out.println("space: " + space);	
 		
+		int eventaction = me.getAction();
+		switch (eventaction)
+		{
+		case MotionEvent.ACTION_DOWN:
+			System.out.println("there was a press down");
+			placeChecker = space;
+			break;
+		case MotionEvent.ACTION_MOVE:
+			System.out.println("there was some movement");
+			//recalc, but dont have to do anything but draw if it chages the space
+			if (oldSpace != space)
+				placeChecker = space;
+			break;
+		case MotionEvent.ACTION_UP:
+			System.out.println("we released the pressing");
+			placeChecker = -1;
+			break;
+		}
 		
+		oldSpace = space;
+		this.invalidate();
 		return true;
+	}
+
+	@Override
+	public void onClick(View v)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 	
 	
