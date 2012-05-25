@@ -35,11 +35,25 @@ public class Board extends View implements OnClickListener
 	protected void onDraw(Canvas canvas) {
 	    super.onDraw(canvas);
 	    //System.out.println("thius is an updated view");
-	    diameter = this.getWidth()/7;
+	    //int smallestWidth = Math.min(this.getWidth(), this.getHeight());
+	    int smallestWidth;
+	    int orientedHeight;
+	    if (this.getWidth() < this.getHeight())
+	    {
+	    	smallestWidth = this.getWidth();
+	    	orientedHeight = this.getHeight();
+	    }
+	    else
+	    {
+	    	smallestWidth = this.getHeight();
+	    	orientedHeight = this.getWidth();
+	    }
+	    
+	    diameter = smallestWidth/7;
 	    //System.out.println(this.getWidth());
 	    float radius = diameter/2;
 	    //System.out.println(this.getHeight());
-	    float spacing = (this.getWidth() - (diameter)*(float)7)/6;
+	    float spacing = (smallestWidth - (diameter)*(float)7)/6;
 	    //System.out.println(spacing);
 	    
 	    for (int row = 1; row <= 6; row++)
@@ -56,7 +70,7 @@ public class Board extends View implements OnClickListener
 	    		else if (board[6-row][i] == 1)
 	    			paint.setColor(Color.BLACK);
 	    		
-	    		canvas.drawCircle((i*diameter)+(radius)+spacing, (this.getHeight()-(diameter*row))+radius, radius, paint);
+	    		canvas.drawCircle((i*diameter)+(radius)+spacing, (orientedHeight-(diameter*row))+radius, radius, paint);
 	    		
 	    	}
 	    }
@@ -75,7 +89,7 @@ public class Board extends View implements OnClickListener
 	    		paint.setColor(Color.BLACK);*/
 	    	
 	    	
-	    	canvas.drawCircle((placeChecker*diameter)+(radius)+spacing, (this.getHeight()-(diameter*7))+radius, radius, paint);
+	    	canvas.drawCircle((placeChecker*diameter)+(radius)+spacing, (orientedHeight-(diameter*7))+radius, radius, paint);
 	    }
 	    
 	    if (dropToken)
@@ -84,7 +98,7 @@ public class Board extends View implements OnClickListener
 	    	//while (dropToken)
 	    	//{
 	    		//System.out.println(placeChecker + "       " + yValue);
-	    		canvas.drawCircle((space*diameter)+(radius)+spacing, (this.getHeight()-(diameter*yValue))+radius, radius, paint);
+	    		canvas.drawCircle((space*diameter)+(radius)+spacing, (orientedHeight-(diameter*yValue))+radius, radius, paint);
 	    		
 	    		System.out.println("Drop speed:  " + yValue + "     " + (board.length-1-findYValue(space)));
 	    		
@@ -105,13 +119,20 @@ public class Board extends View implements OnClickListener
 
 	private void insert(int col, int player)
 	{
+		boolean placedToken = false;
 		for (int i = board.length-1; i >= 0; i--)
 		{
 			if (board[i][col] == -1) //then empty space
 			{
 				board[i][col] = player;
+				placedToken = true;
 				break;
 			}
+		}
+		//if it wasnt placed, then the slot was full so need to try another slot
+		if (!placedToken)
+		{
+			//do a toast message
 		}
 	}
 	
@@ -152,7 +173,7 @@ public class Board extends View implements OnClickListener
 	public boolean onTouchEvent(MotionEvent me)
 	{
 		//if a token is already being dropped, dont let the person change while its dropping
-		if (dropToken)
+		if (!dropToken)
 		{
 			int xloc = (int)me.getX();
 			space = (int)(xloc/diameter);
@@ -204,6 +225,13 @@ public class Board extends View implements OnClickListener
 			}
 		}
 		return -1;
+	}
+	
+	protected boolean gameOver()
+	{
+		
+		
+		return false;
 	}
 	
 	@Override
