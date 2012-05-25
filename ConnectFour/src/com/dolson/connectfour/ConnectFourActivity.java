@@ -2,6 +2,9 @@ package com.dolson.connectfour;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.LinearLayout;
 
 public class ConnectFourActivity extends Activity
@@ -34,4 +37,26 @@ public class ConnectFourActivity extends Activity
     		
     	}*/
     }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+    	MenuInflater mi = this.getMenuInflater();
+    	mi.inflate(R.menu.menu, menu);
+    	return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+    	switch (item.getItemId()) 
+    	{
+        case R.id.new_game:
+            	System.out.println("WE FINALLY GOT TO HERE BITCH");
+            	return true;	 
+    	}
+    	return true;
+    }
+    
+    
 }
