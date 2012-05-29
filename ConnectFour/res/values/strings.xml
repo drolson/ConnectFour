@@ -3,7 +3,10 @@
 
     <string name="hello">Hello World, ConnectFourActivity!</string>
     <string name="app_name">ConnectFour</string>
+    <string name="blank"></string>
+    <string name="vs">vs.</string>
     <string name="new_game">New Game</string>
+    <string name="settings">Settings</string>
     
 
 </resources>

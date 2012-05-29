@@ -34,8 +34,8 @@ public class Board extends View implements OnClickListener
 	@Override
 	protected void onDraw(Canvas canvas) {
 	    super.onDraw(canvas);
-	    //System.out.println("thius is an updated view");
-	    //int smallestWidth = Math.min(this.getWidth(), this.getHeight());
+
+
 	    int smallestWidth;
 	    int orientedHeight;
 	    if (this.getWidth() < this.getHeight())
@@ -100,7 +100,7 @@ public class Board extends View implements OnClickListener
 	    		//System.out.println(placeChecker + "       " + yValue);
 	    		canvas.drawCircle((space*diameter)+(radius)+spacing, (orientedHeight-(diameter*yValue))+radius, radius, paint);
 	    		
-	    		System.out.println("Drop speed:  " + yValue + "     " + (board.length-1-findYValue(space)));
+	    		//System.out.println("Drop speed:  " + yValue + "     " + (board.length-1-findYValue(space)));
 	    		
 	    		if (yValue <= (board.length-findYValue(space)))
 	    		{
@@ -120,11 +120,13 @@ public class Board extends View implements OnClickListener
 	private void insert(int col, int player)
 	{
 		boolean placedToken = false;
+		int row = -1;
 		for (int i = board.length-1; i >= 0; i--)
 		{
 			if (board[i][col] == -1) //then empty space
 			{
 				board[i][col] = player;
+				row = i;
 				placedToken = true;
 				break;
 			}
@@ -134,6 +136,9 @@ public class Board extends View implements OnClickListener
 		{
 			//do a toast message
 		}
+		//otherwise, check to see if anybody won
+		else
+			checkWinner(row, col);
 	}
 	
 	/*
@@ -141,14 +146,152 @@ public class Board extends View implements OnClickListener
 	 * 1 - Player one won
 	 * 2 - Player 2 won
 	 */
-	protected int checkWinner()
+	protected boolean checkWinner(int row, int col)
 	{
-		//check horizontal
-		//check vertical
-		//check forwardslash
-		//check backslash
+		int tempRow = row;
+		int tempCol = col;
 		
-		return 0;
+		//check horizontal
+		int p = -1;
+		int count = 0;
+		for (int j = 0; j < board[row].length; j++)
+		{
+			if (board[row][j] != -1)
+			{
+				if (board[row][j] == p)
+					count++;
+				else
+				{
+					p = board[row][j];
+					count = 1;
+				}
+			}
+			else
+			{
+				p = -1;
+				count = 0;
+			}
+			//we have a winner
+			if (count == 4)
+			{
+				System.out.println("WE HAVE A WINNER horizontal:   " + p);
+				return true;
+			}
+		}
+		
+		
+		//check vertical
+		count = 0;
+		p = -1;
+		for (int j = board.length-1; j >= 0; j--)
+		{
+			if (board[j][col] == -1)
+				break;
+			else
+			{
+				if (board[j][col] == p)
+					count++;
+				else
+				{
+					p = board[j][col];
+					count = 1;
+				}
+			}
+			
+			//check to see if we have 4 in a row
+			if (count == 4)
+			{
+				System.out.println("we have a winner vertical:    " + p);
+				return true;
+			}
+		}
+		
+		
+		//check forwardslash
+		count = 0;
+		p = -1;
+		while (tempRow < board.length && tempCol >= 0)
+		{
+			tempRow++;
+			tempCol--;
+		}
+		tempRow--;
+		tempCol++;
+
+		//now we are at the most bottom left place as possible with that piece placement
+		
+		while (tempRow >= 0 && tempCol < board[0].length)
+		{
+			if (board[tempRow][tempCol] == -1)
+			{
+				count = 0;
+				p = -1;
+			}
+			else
+			{
+				if (board[tempRow][tempCol] == p)
+					count++;
+				else
+				{
+					p = board[tempRow][tempCol];
+					count = 1;
+				}
+			}
+			
+			//check to see if we have a winner
+			if (count == 4)
+			{
+				System.out.println("We have a winner: forwardslash:     " + p);
+				return true;
+			}
+			
+			tempRow--;
+			tempCol++;
+		}
+		
+		//check backslash
+		count = 0;
+		p = -1;
+		tempRow = row;
+		tempCol = col;
+		
+		while (tempRow > 0 && tempCol > 0)
+		{
+			tempRow--;
+			tempCol--;
+		}
+
+		while (tempRow < board.length && tempCol < board[0].length)
+		{
+			if (board[tempRow][tempCol] == -1)
+			{
+				count = 0;
+				p = -1;
+			}
+			else
+			{
+				if (board[tempRow][tempCol] == p)
+					count++;
+				else
+				{
+					p = board[tempRow][tempCol];
+					count = 1;
+				}
+			}
+			
+			//check to see if we have a winner
+			if (count == 4)
+			{
+				System.out.println("We have a winner: backslash:     " + p);
+				return true;
+			}
+			
+			tempRow++;
+			tempCol++;
+		}
+		
+		
+		return false;
 	}
 	
 	@Override
@@ -173,27 +316,27 @@ public class Board extends View implements OnClickListener
 	public boolean onTouchEvent(MotionEvent me)
 	{
 		//if a token is already being dropped, dont let the person change while its dropping
-		if (!dropToken)
+		if (!dropToken) //&& myTurn)
 		{
 			int xloc = (int)me.getX();
 			space = (int)(xloc/diameter);
-			System.out.println("space: " + space);	
+			//System.out.println("space: " + space);	
 			
 			int eventaction = me.getAction();
 			switch (eventaction)
 			{
 			case MotionEvent.ACTION_DOWN:
-				System.out.println("there was a press down");
+				//System.out.println("there was a press down");
 				placeChecker = space;
 				break;
 			case MotionEvent.ACTION_MOVE:
-				System.out.println("there was some movement");
+				//System.out.println("there was some movement");
 				//recalc, but dont have to do anything but draw if it chages the space
 				if (oldSpace != space)
 					placeChecker = space;
 				break;
 			case MotionEvent.ACTION_UP:
-				System.out.println("we released the pressing");
+				//System.out.println("we released the pressing");
 				placeChecker = -1;
 				dropToken = true;
 				yValue = 7;
