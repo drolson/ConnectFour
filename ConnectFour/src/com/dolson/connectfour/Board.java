@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Toast;
 
 public class Board extends View implements OnClickListener
 {
@@ -16,11 +17,14 @@ public class Board extends View implements OnClickListener
 	private float diameter;
 	private int space = -1;
 	private int oldSpace;
-	private int turn = 0;
 	private final float dropSpeed = (float)0.25;
 	private float yValue;
 	private boolean dropToken = false;
-	
+	private boolean isWinner = false;
+	private int playerTurn = 0;
+		
+	Player p1;
+	Player p2;
 	
 	public Board(Context context)
 	{
@@ -29,6 +33,10 @@ public class Board extends View implements OnClickListener
 			for (int i = 0; i < board.length; i++)
 				for (int j = 0; j < board[0].length; j++)
 					board[i][j] = -1;
+			
+		p1 = new Player("test1", 0, 0, this);
+		p2 = new Player("test2", 1, 1, this);
+		this.notifyPlayerTurn();
 	}
 
 	@Override
@@ -50,11 +58,11 @@ public class Board extends View implements OnClickListener
 	    }
 	    
 	    diameter = smallestWidth/7;
-	    //System.out.println(this.getWidth());
+	    
 	    float radius = diameter/2;
-	    //System.out.println(this.getHeight());
+	   
 	    float spacing = (smallestWidth - (diameter)*(float)7)/6;
-	    //System.out.println(spacing);
+	   
 	    
 	    for (int row = 1; row <= 6; row++)
 	    {
@@ -76,44 +84,35 @@ public class Board extends View implements OnClickListener
 	    }
 	    
 	    //this will draw the checker that hasnt been dropped but will be when button released
-	    if (turn == 0)
+	    if (playerTurn == 0)
     		paint.setColor(Color.RED);
     	else
     		paint.setColor(Color.BLACK);
 	    
 	    if (placeChecker != -1)
 	    {
-	    	/*if (turn == 0)
-	    		paint.setColor(Color.RED);
-	    	else
-	    		paint.setColor(Color.BLACK);*/
-	    	
-	    	
 	    	canvas.drawCircle((placeChecker*diameter)+(radius)+spacing, (orientedHeight-(diameter*7))+radius, radius, paint);
 	    }
 	    
 	    if (dropToken)
 	    {
+	    	canvas.drawCircle((space*diameter)+(radius)+spacing, (orientedHeight-(diameter*yValue))+radius, radius, paint);
 	    	
-	    	//while (dropToken)
-	    	//{
-	    		//System.out.println(placeChecker + "       " + yValue);
-	    		canvas.drawCircle((space*diameter)+(radius)+spacing, (orientedHeight-(diameter*yValue))+radius, radius, paint);
-	    		
-	    		//System.out.println("Drop speed:  " + yValue + "     " + (board.length-1-findYValue(space)));
-	    		
-	    		if (yValue <= (board.length-findYValue(space)))
+	    	
+	    	if (yValue <= (board.length-findYValue(space)))
+	    	{
+	    		insert(space, playerTurn);
+	    		if (!isWinner)
 	    		{
-	    			insert(space, turn);
-	    			turn = (turn+1)%2;
+	    			playerTurn = (playerTurn+1)%2;
 	    			dropToken = false;
+	    			this.notifyPlayerTurn();
 	    		}
-	    		yValue = yValue - dropSpeed;
-	    		this.invalidate();
-	    	//}
-	    }
-	    
-	    
+	    		
+	    	}
+	    	yValue = yValue - dropSpeed;
+	    	this.invalidate();
+	    } 
 	}
 	
 
@@ -138,7 +137,10 @@ public class Board extends View implements OnClickListener
 		}
 		//otherwise, check to see if anybody won
 		else
+		{
 			checkWinner(row, col);
+		}
+			
 	}
 	
 	/*
@@ -174,8 +176,11 @@ public class Board extends View implements OnClickListener
 			//we have a winner
 			if (count == 4)
 			{
-				System.out.println("WE HAVE A WINNER horizontal:   " + p);
-				return true;
+				CharSequence text = "Winner! Winner! Winner!   " + this.getPlayer(playerTurn).getName();
+				int duration = Toast.LENGTH_SHORT;
+				Toast toast = Toast.makeText(super.getContext(), text, duration);
+				toast.show();
+				isWinner = true;
 			}
 		}
 		
@@ -201,8 +206,11 @@ public class Board extends View implements OnClickListener
 			//check to see if we have 4 in a row
 			if (count == 4)
 			{
-				System.out.println("we have a winner vertical:    " + p);
-				return true;
+				CharSequence text = "Winner! Winner! Winner!   " + this.getPlayer(playerTurn).getName();
+				int duration = Toast.LENGTH_SHORT;
+				Toast toast = Toast.makeText(super.getContext(), text, duration);
+				toast.show();
+				isWinner = true;
 			}
 		}
 		
@@ -241,8 +249,11 @@ public class Board extends View implements OnClickListener
 			//check to see if we have a winner
 			if (count == 4)
 			{
-				System.out.println("We have a winner: forwardslash:     " + p);
-				return true;
+				CharSequence text = "Winner! Winner! Winner!   " + this.getPlayer(playerTurn).getName();
+				int duration = Toast.LENGTH_SHORT;
+				Toast toast = Toast.makeText(super.getContext(), text, duration);
+				toast.show();
+				isWinner = true;
 			}
 			
 			tempRow--;
@@ -282,8 +293,11 @@ public class Board extends View implements OnClickListener
 			//check to see if we have a winner
 			if (count == 4)
 			{
-				System.out.println("We have a winner: backslash:     " + p);
-				return true;
+				CharSequence text = "Winner! Winner! Winner!   " + this.getPlayer(playerTurn).getName();
+				int duration = Toast.LENGTH_SHORT;
+				Toast toast = Toast.makeText(super.getContext(), text, duration);
+				toast.show();
+				isWinner = true;
 			}
 			
 			tempRow++;
@@ -291,7 +305,7 @@ public class Board extends View implements OnClickListener
 		}
 		
 		
-		return false;
+		return isWinner;
 	}
 	
 	@Override
@@ -305,38 +319,34 @@ public class Board extends View implements OnClickListener
 				s += "|" + board[row][col];
 			}
 			
-			s+="|/n";
+			s+="|\n";
 		}
 		return s;
 	}
 
 	
-	
 	@Override
 	public boolean onTouchEvent(MotionEvent me)
 	{
 		//if a token is already being dropped, dont let the person change while its dropping
-		if (!dropToken) //&& myTurn)
+		//also if there is a winner, don't let there be any more input
+		//also if the computer is playing, we dont get any input
+		if (!dropToken && !isWinner && this.getPlayer(playerTurn).isHuman())
 		{
 			int xloc = (int)me.getX();
-			space = (int)(xloc/diameter);
-			//System.out.println("space: " + space);	
+			space = (int)(xloc/diameter);	
 			
 			int eventaction = me.getAction();
 			switch (eventaction)
 			{
 			case MotionEvent.ACTION_DOWN:
-				//System.out.println("there was a press down");
 				placeChecker = space;
 				break;
 			case MotionEvent.ACTION_MOVE:
-				//System.out.println("there was some movement");
-				//recalc, but dont have to do anything but draw if it chages the space
 				if (oldSpace != space)
 					placeChecker = space;
 				break;
 			case MotionEvent.ACTION_UP:
-				//System.out.println("we released the pressing");
 				placeChecker = -1;
 				dropToken = true;
 				yValue = 7;
@@ -348,15 +358,6 @@ public class Board extends View implements OnClickListener
 		}
 		return true;
 	}
-
-	/*private void placeChecker()
-	{
-		for (int i = 5; i <= 0; i++)
-		{
-			if (board[space][i] == -1)
-				board[space][i] = turn;
-		}
-	}*/
 	
 	private int findYValue(int col)
 	{
@@ -369,12 +370,39 @@ public class Board extends View implements OnClickListener
 		}
 		return -1;
 	}
-	
-	protected boolean gameOver()
+	protected Player getPlayer(int id)
 	{
-		
-		
-		return false;
+		if (p1.getID() == id)
+			return p1;
+		else if (p2.getID() == id)
+			return p2;
+		else
+			return null;
+	}
+
+	protected void setSpace(int i)
+	{
+		if (board[0][i] != -1)
+		{
+			CharSequence text = "Winner! Winner! Winner!   " + this.getPlayer(playerTurn).getName();
+			int duration = Toast.LENGTH_SHORT;
+			Toast toast = Toast.makeText(super.getContext(), text, duration);
+			toast.show();
+			
+			this.notifyPlayerTurn();
+		}
+		else
+		{
+			oldSpace = i;
+			space = i;
+			dropToken = true;
+			yValue = (float)7.25;
+		}
+	}
+
+	private void notifyPlayerTurn()
+	{
+		this.getPlayer(playerTurn).notifyPlayerTurn();
 	}
 	
 	@Override
@@ -383,6 +411,5 @@ public class Board extends View implements OnClickListener
 		// TODO Auto-generated method stub
 		
 	}
-	
 	
 }
