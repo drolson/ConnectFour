@@ -11,7 +11,13 @@ public class IntermediateStrategy implements Strategy
 	@Override
 	public void move()
 	{
-		board.setSpace(1);
+		int move = 2;
+		
+		do 
+		{
+			move = (move+1)%7;
+			
+		} while (board.setSpace(move) == 1);
 	}
 
 }

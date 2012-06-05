@@ -9,7 +9,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:textColor="@color/red"
         android:text="@string/player1_settings"
+        android:background="@color/grey"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 	
 	<RadioGroup 
@@ -19,26 +21,26 @@
 		android:layout_below="@id/Player1_text"  >
 	    
 	    <RadioButton
-	        android:id="@+id/humanRadio1"
+	        android:id="@+id/radio00"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/human"
 	        android:checked="true" />
 	    
 	    <RadioButton
-	        android:id="@+id/beginnerRadio1"
+	        android:id="@+id/radio01"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/beginner" />
 	
 	    <RadioButton
-	        android:id="@+id/intermediateRadio1"
+	        android:id="@+id/radio02"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/intermediate" />
 	
 	    <RadioButton
-	        android:id="@+id/expertRadio1"
+	        android:id="@+id/radio03"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/expert" />
@@ -51,6 +53,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/player1_radio_group"
         android:text="@string/player2_settings"
+        android:textColor="@color/black"
+        android:background="@color/grey"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 	
 	<RadioGroup 
@@ -60,26 +64,26 @@
 		android:layout_below="@id/Player2_text"  >
 	    
 	    <RadioButton
-	        android:id="@+id/humanRadio2"
+	        android:id="@+id/radio10"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/human" />
 	    
 	    <RadioButton
-	        android:id="@+id/beginnerRadio2"
+	        android:id="@+id/radio11"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/beginner" />
 	
 	    <RadioButton
-	        android:id="@+id/intermediateRadio2"
+	        android:id="@+id/radio12"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/intermediate"
 	        android:checked="true" />
 	
 	    <RadioButton
-	        android:id="@+id/expertRadio2"
+	        android:id="@+id/radio13"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/expert" />

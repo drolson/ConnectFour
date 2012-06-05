@@ -13,29 +13,27 @@ public class Board extends View implements OnClickListener
 {
 	private int[][] board;
 	private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-	private int placeChecker = -1;
+	private int placeChecker;
 	private float diameter;
-	private int space = -1;
+	private int space;
 	private int oldSpace;
 	private final float dropSpeed = (float)0.25;
 	private float yValue;
-	private boolean dropToken = false;
-	private boolean isWinner = false;
-	private int playerTurn = 0;
+	private boolean dropToken;
+	private boolean isWinner;
+	private int playerTurn;
 		
-	Player p1;
-	Player p2;
+	private Player p0;
+	private Player p1;
 	
 	public Board(Context context)
 	{
 		super(context);
-		board = new int[6][7];
-			for (int i = 0; i < board.length; i++)
-				for (int j = 0; j < board[0].length; j++)
-					board[i][j] = -1;
+		
+		this.resetBoard();
 			
-		p1 = new Player("test1", 0, 0, this);
-		p2 = new Player("test2", 1, 1, this);
+		p0 = new Player("test1", 0, 0, this);
+		p1 = new Player("test2", 1, 0, this);
 		this.notifyPlayerTurn();
 	}
 
@@ -102,10 +100,10 @@ public class Board extends View implements OnClickListener
 	    	if (yValue <= (board.length-findYValue(space)))
 	    	{
 	    		insert(space, playerTurn);
+	    		dropToken = false;
 	    		if (!isWinner)
 	    		{
 	    			playerTurn = (playerTurn+1)%2;
-	    			dropToken = false;
 	    			this.notifyPlayerTurn();
 	    		}
 	    		
@@ -372,37 +370,39 @@ public class Board extends View implements OnClickListener
 	}
 	protected Player getPlayer(int id)
 	{
-		if (p1.getID() == id)
+		if (p0.getID() == id)
+			return p0;
+		else if (p1.getID() == id)
 			return p1;
-		else if (p2.getID() == id)
-			return p2;
 		else
 			return null;
 	}
 
-	protected void setSpace(int i)
+	protected int setSpace(int i)
 	{
-		if (board[0][i] != -1)
+		//then we have tried to put something where its full already
+		if (!isWinner)
 		{
-			CharSequence text = "Winner! Winner! Winner!   " + this.getPlayer(playerTurn).getName();
-			int duration = Toast.LENGTH_SHORT;
-			Toast toast = Toast.makeText(super.getContext(), text, duration);
-			toast.show();
-			
-			this.notifyPlayerTurn();
+			if (board[0][i] != -1)
+			{
+				// illegal move
+				return 1;
+				//this.notifyPlayerTurn();
+			}
+			else
+			{
+				oldSpace = i;
+				space = i;
+				dropToken = true;
+				yValue = (float)7.25;
+			}
 		}
-		else
-		{
-			oldSpace = i;
-			space = i;
-			dropToken = true;
-			yValue = (float)7.25;
-		}
+		return 0;
 	}
 
-	private void notifyPlayerTurn()
+	protected void notifyPlayerTurn()
 	{
-		this.getPlayer(playerTurn).notifyPlayerTurn();
+		this.getPlayer(playerTurn).notifyTurn();
 	}
 	
 	@Override
@@ -412,4 +412,18 @@ public class Board extends View implements OnClickListener
 		
 	}
 	
+	public void resetBoard()
+	{
+		board = new int[6][7];
+		for (int i = 0; i < board.length; i++)
+			for (int j = 0; j < board[0].length; j++)
+				board[i][j] = -1;
+		
+		isWinner = false;
+		placeChecker = -1;
+		space = -1;
+		dropToken = false;
+		isWinner = false;
+		playerTurn = 0;
+	}
 }

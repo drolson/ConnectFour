@@ -15,7 +15,13 @@ public class BeginnerStrategy implements Strategy
 	@Override
 	public void move()
 	{
-		board.setSpace(0);
+		int move = -1;
+		
+		do 
+		{
+			move = (move+1)%7;
+			
+		} while (board.setSpace(move) == 1);
 	}
 
 }
