@@ -45,7 +45,8 @@ public class Board extends View implements OnClickListener
 	}
 
 	@Override
-	protected void onDraw(Canvas canvas) {
+	protected void onDraw(Canvas canvas) 
+	{
 	    super.onDraw(canvas);
 	    
 
@@ -87,8 +88,11 @@ public class Board extends View implements OnClickListener
 	    		else if (board[6-row][i] == 1)
 	    			paint.setColor(Color.BLACK);
 	    		
-	    		canvas.drawCircle((i*diameter)+(radius)+((i+1)*spacing)+(i*spacing), (orientedHeight-(diameter*row))+radius, radius, paint);	
+	    		//paint.setColor(Color.GREEN);
+	    		
+	    		canvas.drawCircle((i*diameter)+(radius)+((i+1)*spacing)+(i*spacing), (orientedHeight-(diameter*row))+radius-((row-1)*spacing*2), radius, paint);	
 	    	}
+	    	System.out.println(row);
 	    	//canvas.drawBitmap(boardImage, null, new Rect(0, (int)(orientedHeight-(616*((float)smallestWidth/(float)720))), smallestWidth, orientedHeight), paint);
 	    }
 	    
@@ -100,13 +104,13 @@ public class Board extends View implements OnClickListener
 	    
 	    if (placeChecker != -1)
 	    {
-	    	canvas.drawCircle((placeChecker*diameter)+(radius)+(placeChecker+1)*spacing+placeChecker*spacing, (orientedHeight-(diameter*7))+radius, radius, paint);
+	    	canvas.drawCircle((placeChecker*diameter)+(radius)+(2*placeChecker+1)*spacing, (orientedHeight-(diameter*7))+radius-(5*spacing*2)-1, radius, paint);
 	    }
 	    
 	    if (dropToken)
 	    {
-	    	
-	    	canvas.drawCircle((space*diameter)+(radius)+(space+1)*spacing+space*spacing, (orientedHeight-(diameter*yValue))+radius, radius, paint);
+	    	int row = this.findYValue(space);
+	    	canvas.drawCircle((space*diameter)+(radius)+(2*space+1)*spacing, (orientedHeight-(diameter*yValue))+radius-((5-row)*spacing*2), radius, paint);
 	    	
 	    	
 	    	if (yValue <= (board.length-findYValue(space)))
@@ -127,7 +131,7 @@ public class Board extends View implements OnClickListener
 	    
 	    
 	    
-	    //canvas.drawBitmap(boardImage, null, new Rect(0, (int)(orientedHeight-(616*((float)smallestWidth/(float)728))), smallestWidth, orientedHeight), paint);
+	    canvas.drawBitmap(boardImage, null, new Rect(0, (int)(orientedHeight-(616*((float)smallestWidth/(float)728))), smallestWidth, orientedHeight), paint);
 	    
 	}
 	
@@ -387,6 +391,7 @@ public class Board extends View implements OnClickListener
 		}
 		return -1;
 	}
+	
 	protected Player getPlayer(int id)
 	{
 		if (p0.getID() == id)
