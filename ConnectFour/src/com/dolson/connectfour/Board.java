@@ -1,9 +1,12 @@
 package com.dolson.connectfour;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,6 +25,10 @@ public class Board extends View implements OnClickListener
 	private boolean dropToken;
 	private boolean isWinner;
 	private int playerTurn;
+	float spacing;
+	int smallestWidth;
+    int orientedHeight;
+	Bitmap boardImage = BitmapFactory.decodeResource(getResources(), R.drawable.board);
 		
 	private Player p0;
 	private Player p1;
@@ -40,13 +47,13 @@ public class Board extends View implements OnClickListener
 	@Override
 	protected void onDraw(Canvas canvas) {
 	    super.onDraw(canvas);
+	    
 
-
-	    int smallestWidth;
-	    int orientedHeight;
+	    
 	    if (this.getWidth() < this.getHeight())
 	    {
 	    	smallestWidth = this.getWidth();
+	    	System.out.println("test"+smallestWidth);
 	    	orientedHeight = this.getHeight();
 	    }
 	    else
@@ -54,12 +61,16 @@ public class Board extends View implements OnClickListener
 	    	smallestWidth = this.getHeight();
 	    	orientedHeight = this.getWidth();
 	    }
+
 	    
-	    diameter = smallestWidth/7;
+	    spacing = 4*((float)smallestWidth/(float)728);
+	    System.out.println("spacing"+spacing);
+	    diameter = 96*((float)smallestWidth/(float)728);
+	    System.out.println("diameter"+diameter);
 	    
 	    float radius = diameter/2;
 	   
-	    float spacing = (smallestWidth - (diameter)*(float)7)/6;
+	    System.out.println("total  " + (spacing*14 + diameter*7));
 	   
 	    
 	    for (int row = 1; row <= 6; row++)
@@ -76,9 +87,9 @@ public class Board extends View implements OnClickListener
 	    		else if (board[6-row][i] == 1)
 	    			paint.setColor(Color.BLACK);
 	    		
-	    		canvas.drawCircle((i*diameter)+(radius)+spacing, (orientedHeight-(diameter*row))+radius, radius, paint);
-	    		
+	    		canvas.drawCircle((i*diameter)+(radius)+((i+1)*spacing)+(i*spacing), (orientedHeight-(diameter*row))+radius, radius, paint);	
 	    	}
+	    	//canvas.drawBitmap(boardImage, null, new Rect(0, (int)(orientedHeight-(616*((float)smallestWidth/(float)720))), smallestWidth, orientedHeight), paint);
 	    }
 	    
 	    //this will draw the checker that hasnt been dropped but will be when button released
@@ -89,12 +100,13 @@ public class Board extends View implements OnClickListener
 	    
 	    if (placeChecker != -1)
 	    {
-	    	canvas.drawCircle((placeChecker*diameter)+(radius)+spacing, (orientedHeight-(diameter*7))+radius, radius, paint);
+	    	canvas.drawCircle((placeChecker*diameter)+(radius)+(placeChecker+1)*spacing+placeChecker*spacing, (orientedHeight-(diameter*7))+radius, radius, paint);
 	    }
 	    
 	    if (dropToken)
 	    {
-	    	canvas.drawCircle((space*diameter)+(radius)+spacing, (orientedHeight-(diameter*yValue))+radius, radius, paint);
+	    	
+	    	canvas.drawCircle((space*diameter)+(radius)+(space+1)*spacing+space*spacing, (orientedHeight-(diameter*yValue))+radius, radius, paint);
 	    	
 	    	
 	    	if (yValue <= (board.length-findYValue(space)))
@@ -109,8 +121,14 @@ public class Board extends View implements OnClickListener
 	    		
 	    	}
 	    	yValue = yValue - dropSpeed;
+	    	//canvas.drawBitmap(boardImage, 0, orientedHeight - boardImage.getHeight(), paint);
 	    	this.invalidate();
-	    } 
+	    }
+	    
+	    
+	    
+	    //canvas.drawBitmap(boardImage, null, new Rect(0, (int)(orientedHeight-(616*((float)smallestWidth/(float)728))), smallestWidth, orientedHeight), paint);
+	    
 	}
 	
 
@@ -331,8 +349,9 @@ public class Board extends View implements OnClickListener
 		//also if the computer is playing, we dont get any input
 		if (!dropToken && !isWinner && this.getPlayer(playerTurn).isHuman())
 		{
-			int xloc = (int)me.getX();
-			space = (int)(xloc/diameter);	
+			float xloc = me.getX();
+			System.out.println(me.getX());
+			space = (int)((xloc-1)/((float)smallestWidth/(float)7));	
 			
 			int eventaction = me.getAction();
 			switch (eventaction)
