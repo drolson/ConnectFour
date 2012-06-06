@@ -3,9 +3,12 @@ package com.dolson.connectfour;
 public class ExpertStrategy implements Strategy
 {
 	Board board;
-	public ExpertStrategy(Board board)
+	Player p;
+	
+	public ExpertStrategy(Player p)
 	{
-		this.board = board;
+		this.p = p;
+		board = p.getBoard();
 	}
 	
 	@Override

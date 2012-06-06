@@ -69,10 +69,15 @@ public class Player
 		if (strat == 0)
 			strategy = null;
 		else if (strat == 1)
-			strategy = new BeginnerStrategy(board);
+			strategy = new BeginnerStrategy(this);
 		else if (strat == 2)
-			strategy = new IntermediateStrategy(board);
+			strategy = new IntermediateStrategy(this);
 		else if (strat == 3)
-			strategy = new ExpertStrategy(board);
+			strategy = new ExpertStrategy(this);
+	}
+	
+	public Board getBoard()
+	{
+		return board;
 	}
 }

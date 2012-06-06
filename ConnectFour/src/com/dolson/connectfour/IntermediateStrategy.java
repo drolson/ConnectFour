@@ -3,9 +3,12 @@ package com.dolson.connectfour;
 public class IntermediateStrategy implements Strategy
 {
 	Board board;
-	public IntermediateStrategy(Board board)
+	Player p;
+	
+	public IntermediateStrategy(Player p)
 	{
-		this.board = board;
+		this.p = p;
+		board = p.getBoard();
 	}
 	
 	@Override

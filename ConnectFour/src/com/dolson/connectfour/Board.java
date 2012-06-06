@@ -18,7 +18,7 @@ public class Board extends View implements OnClickListener
 	private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 	private int placeChecker;
 	private float diameter;
-	private int space;
+	private int space = 4;
 	private int oldSpace;
 	private final float dropSpeed = (float)0.25;
 	private float yValue;
@@ -28,6 +28,8 @@ public class Board extends View implements OnClickListener
 	float spacing;
 	int smallestWidth;
     int orientedHeight;
+    float actualWidth = 728;
+    float actualHeight = 624;
 	Bitmap boardImage = BitmapFactory.decodeResource(getResources(), R.drawable.board);
 		
 	private Player p0;
@@ -39,8 +41,8 @@ public class Board extends View implements OnClickListener
 		
 		this.resetBoard();
 			
-		p0 = new Player("test1", 0, 0, this);
-		p1 = new Player("test2", 1, 0, this);
+		p0 = new Player("test1", 0, 1, this);
+		p1 = new Player("test2", 1, 1, this);
 		this.notifyPlayerTurn();
 	}
 
@@ -54,7 +56,7 @@ public class Board extends View implements OnClickListener
 	    if (this.getWidth() < this.getHeight())
 	    {
 	    	smallestWidth = this.getWidth();
-	    	System.out.println("test"+smallestWidth);
+	    	//System.out.println("test"+smallestWidth);
 	    	orientedHeight = this.getHeight();
 	    }
 	    else
@@ -64,14 +66,14 @@ public class Board extends View implements OnClickListener
 	    }
 
 	    
-	    spacing = 4*((float)smallestWidth/(float)728);
-	    System.out.println("spacing"+spacing);
-	    diameter = 96*((float)smallestWidth/(float)728);
-	    System.out.println("diameter"+diameter);
+	    spacing = 2*((float)smallestWidth/actualWidth);
+	    //System.out.println("spacing"+spacing);
+	    diameter = 100*((float)smallestWidth/actualWidth);
+	    //System.out.println("diameter"+diameter);
 	    
 	    float radius = diameter/2;
 	   
-	    System.out.println("total  " + (spacing*14 + diameter*7));
+	    //System.out.println("total  " + (spacing*14 + diameter*7));
 	   
 	    
 	    for (int row = 1; row <= 6; row++)
@@ -90,9 +92,9 @@ public class Board extends View implements OnClickListener
 	    		
 	    		//paint.setColor(Color.GREEN);
 	    		
-	    		canvas.drawCircle((i*diameter)+(radius)+((i+1)*spacing)+(i*spacing), (orientedHeight-(diameter*row))+radius-((row-1)*spacing*2), radius, paint);	
+	    		canvas.drawCircle((i*diameter)+(radius)+((i+1)*spacing)+(i*spacing), (orientedHeight-(diameter*row))+radius-((row-1)*spacing*2)-spacing, radius, paint);	
 	    	}
-	    	System.out.println(row);
+	    	//System.out.println(row);
 	    	//canvas.drawBitmap(boardImage, null, new Rect(0, (int)(orientedHeight-(616*((float)smallestWidth/(float)720))), smallestWidth, orientedHeight), paint);
 	    }
 	    
@@ -104,16 +106,16 @@ public class Board extends View implements OnClickListener
 	    
 	    if (placeChecker != -1)
 	    {
-	    	canvas.drawCircle((placeChecker*diameter)+(radius)+(2*placeChecker+1)*spacing, (orientedHeight-(diameter*7))+radius-(5*spacing*2)-1, radius, paint);
+	    	canvas.drawCircle((placeChecker*diameter)+(radius)+(2*placeChecker+1)*spacing, (orientedHeight-(diameter*7))+radius-(10*spacing)-2*spacing, radius, paint);
 	    }
 	    
 	    if (dropToken)
 	    {
-	    	int row = this.findYValue(space);
+	    	int row = getYValue(space);
 	    	canvas.drawCircle((space*diameter)+(radius)+(2*space+1)*spacing, (orientedHeight-(diameter*yValue))+radius-((5-row)*spacing*2), radius, paint);
 	    	
-	    	
-	    	if (yValue <= (board.length-findYValue(space)))
+	    	yValue = yValue - dropSpeed;
+	    	if (yValue <= (board.length-row))
 	    	{
 	    		insert(space, playerTurn);
 	    		dropToken = false;
@@ -124,14 +126,14 @@ public class Board extends View implements OnClickListener
 	    		}
 	    		
 	    	}
-	    	yValue = yValue - dropSpeed;
+	    	
 	    	//canvas.drawBitmap(boardImage, 0, orientedHeight - boardImage.getHeight(), paint);
 	    	this.invalidate();
 	    }
 	    
 	    
 	    
-	    canvas.drawBitmap(boardImage, null, new Rect(0, (int)(orientedHeight-(616*((float)smallestWidth/(float)728))), smallestWidth, orientedHeight), paint);
+	    canvas.drawBitmap(boardImage, null, new Rect(0, (int)(orientedHeight-(actualHeight*((float)smallestWidth/actualWidth))), smallestWidth, orientedHeight), paint);
 	    
 	}
 	
@@ -158,7 +160,13 @@ public class Board extends View implements OnClickListener
 		//otherwise, check to see if anybody won
 		else
 		{
-			checkWinner(row, col);
+			if (checkWinner(row, col, 4) > 0)
+			{
+				CharSequence text = "Winner! Winner! Winner!   " + this.getPlayer(playerTurn).getName();
+				int duration = Toast.LENGTH_SHORT;
+				Toast toast = Toast.makeText(super.getContext(), text, duration);
+				toast.show();
+			}
 		}
 			
 	}
@@ -168,10 +176,11 @@ public class Board extends View implements OnClickListener
 	 * 1 - Player one won
 	 * 2 - Player 2 won
 	 */
-	protected boolean checkWinner(int row, int col)
+	protected int checkWinner(int row, int col, int inarow)
 	{
 		int tempRow = row;
 		int tempCol = col;
+		int matched = 0;
 		
 		//check horizontal
 		int p = -1;
@@ -194,13 +203,9 @@ public class Board extends View implements OnClickListener
 				count = 0;
 			}
 			//we have a winner
-			if (count == 4)
+			if (count == inarow)
 			{
-				CharSequence text = "Winner! Winner! Winner!   " + this.getPlayer(playerTurn).getName();
-				int duration = Toast.LENGTH_SHORT;
-				Toast toast = Toast.makeText(super.getContext(), text, duration);
-				toast.show();
-				isWinner = true;
+				matched = 1;
 			}
 		}
 		
@@ -224,13 +229,9 @@ public class Board extends View implements OnClickListener
 			}
 			
 			//check to see if we have 4 in a row
-			if (count == 4)
+			if (count == inarow)
 			{
-				CharSequence text = "Winner! Winner! Winner!   " + this.getPlayer(playerTurn).getName();
-				int duration = Toast.LENGTH_SHORT;
-				Toast toast = Toast.makeText(super.getContext(), text, duration);
-				toast.show();
-				isWinner = true;
+				matched = 2;
 			}
 		}
 		
@@ -267,13 +268,9 @@ public class Board extends View implements OnClickListener
 			}
 			
 			//check to see if we have a winner
-			if (count == 4)
+			if (count == inarow)
 			{
-				CharSequence text = "Winner! Winner! Winner!   " + this.getPlayer(playerTurn).getName();
-				int duration = Toast.LENGTH_SHORT;
-				Toast toast = Toast.makeText(super.getContext(), text, duration);
-				toast.show();
-				isWinner = true;
+				matched = 3;
 			}
 			
 			tempRow--;
@@ -311,21 +308,23 @@ public class Board extends View implements OnClickListener
 			}
 			
 			//check to see if we have a winner
-			if (count == 4)
+			if (count == inarow)
 			{
-				CharSequence text = "Winner! Winner! Winner!   " + this.getPlayer(playerTurn).getName();
-				int duration = Toast.LENGTH_SHORT;
-				Toast toast = Toast.makeText(super.getContext(), text, duration);
-				toast.show();
-				isWinner = true;
+				matched = 4;
 			}
 			
 			tempRow++;
 			tempCol++;
 		}
-		
-		
-		return isWinner;
+
+		if (matched > 0)
+		{
+			if (inarow == 4)
+				isWinner = true;
+			return matched;
+		}
+		else
+			return matched;
 	}
 	
 	@Override
@@ -354,7 +353,6 @@ public class Board extends View implements OnClickListener
 		if (!dropToken && !isWinner && this.getPlayer(playerTurn).isHuman())
 		{
 			float xloc = me.getX();
-			System.out.println(me.getX());
 			space = (int)((xloc-1)/((float)smallestWidth/(float)7));	
 			
 			int eventaction = me.getAction();
@@ -380,13 +378,16 @@ public class Board extends View implements OnClickListener
 		return true;
 	}
 	
-	private int findYValue(int col)
+	protected int getYValue(int col)
 	{
-		for (int i = board.length-1; i >= 0; i--)
+		if (col >= 0 && col < board[0].length)
 		{
-			if (board[i][col] == -1) //then empty space
+			for (int i = board.length-1; i >= 0; i--)
 			{
-				return i;
+				if (board[i][col] == -1) //then empty space
+				{
+					return i;
+				}
 			}
 		}
 		return -1;
@@ -404,26 +405,35 @@ public class Board extends View implements OnClickListener
 
 	protected int setSpace(int i)
 	{
-		//then we have tried to put something where its full already
 		if (!isWinner)
 		{
-			if (board[0][i] != -1)
+			//then we have tried to put something where its full already
+			if (i >= 0 && i < board[0].length)
 			{
-				// illegal move
-				return 1;
-				//this.notifyPlayerTurn();
+				if (board[0][i] != -1)
+				{
+					// illegal move
+					return 1;
+				}
+				else
+				{
+					oldSpace = i;
+					space = i;
+					dropToken = true;
+					yValue = (float)7.25;
+				}
 			}
 			else
-			{
-				oldSpace = i;
-				space = i;
-				dropToken = true;
-				yValue = (float)7.25;
-			}
+				return 1;
 		}
 		return 0;
 	}
 
+	public int getSpace()
+	{
+		return space;
+	}
+	
 	protected void notifyPlayerTurn()
 	{
 		this.getPlayer(playerTurn).notifyTurn();
@@ -445,9 +455,14 @@ public class Board extends View implements OnClickListener
 		
 		isWinner = false;
 		placeChecker = -1;
-		space = -1;
+		space = 4;
 		dropToken = false;
 		isWinner = false;
 		playerTurn = 0;
+	}
+	
+	public int[][] getBoard()
+	{
+		return board;
 	}
 }
