@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, ConnectFourActivity!</string>
-    <string name="app_name">ConnectFour</string>
+    <string name="hello">Hello World, AttachFourActivity!</string>
+    <string name="app_name">AttachFour</string>
     <string name="blank"></string>
     <string name="vs">vs.</string>
     <string name="new_game">New Game</string>

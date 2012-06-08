@@ -42,7 +42,7 @@ public class Player
 	{
 		//if its not human, then tell them to move
 		if (strategy != null)
-			strategy.move();
+			new Thread(strategy).start();
 	}
 	
 	protected int getStrat()

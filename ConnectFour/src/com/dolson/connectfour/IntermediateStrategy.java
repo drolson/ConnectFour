@@ -22,4 +22,11 @@ public class IntermediateStrategy implements Strategy
 			
 		} while (board.setSpace(move) == 1);
 	}
+
+	@Override
+	public void run()
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -5,28 +5,25 @@ public class ExpertStrategy implements Strategy
 	Board board;
 	Player p;
 	private final int MAX = Integer.MAX_VALUE;
-	private final int MIN = Integer.MIN_VALUE;
+	private final int MIN = -1*MAX;
 	//int [][] tb = new int[6][7];
 	int [][] b = new int[6][7];
+	int myID;
+	int otherID;
+	int main;
 	
 	public ExpertStrategy(Player p)
 	{
 		this.p = p;
 		board = p.getBoard();
+		myID = p.getID();
+		otherID = (myID+1)%2;
 	}
 	
 	@Override
 	public void move()
 	{
-		// TODO Auto-generated method stub
-		int move = 4;
 		
-		do 
-		{
-			move = minimax(board.getBoard(), 5);
-			System.out.println("trying expert move " + move);
-			
-		} while (board.setSpace(move) == 1);
 	}
 
 	private void addPiece(int col, int player)
@@ -75,18 +72,20 @@ public class ExpertStrategy implements Strategy
 		}
 		
 		int max = MIN;
-		int index = 3; //start at center column
+		int index = 0; //start at center column
 		
 		for (int i = 0; i < b[0].length; i++)
 		{
 			if (b[0][i] == -1) //then not full
 			{
-				addPiece(i, p.getID());
-				int strength = minNode(depth-1, max);
+				addPiece(i, myID);
+				int strength = maxNode(depth-1, max);
+				System.out.println("strength for " + i + " is: " + strength);
 				if (strength > max)
 				{
 					index = i;
 					max = strength;
+					System.out.println("chaning the index value");
 				}
 				removePiece(i);
 			}
@@ -95,67 +94,71 @@ public class ExpertStrategy implements Strategy
 		return index;
 	}
 	
-	private int minNode(int depth, int parentMin)
+	private int maxNode(int depth, int parentMax)
 	{
-		//System.out.println("max");
+		//System.out.println("min");
 		if (depth <= 0)
 		{
-			return winner();
+			return winner(otherID);
 		}
+		//int min = MIN;
 		int max = MIN;
 		
 		for (int i = 0; i < b[0].length; i++)
 		{
 			if (b[0][i] == -1) //then not full
 			{
-				addPiece(i, (p.getID()+1)%2);
-				int strength = maxNode(depth-1, max);
-				if (strength > parentMin)
+				addPiece(i, otherID);
+				int strength = minNode(depth-1, max);
+				if (strength > parentMax)
 				{
 					removePiece(i);
-					return strength;
+					max = strength;
 				}
-				if(strength > max)
+				/*if(strength > max)
                 {
                     max = strength;
-                }
+                }*/
 				removePiece(i);
 			}
 		}
 		return max;
 	}
 	
-	private int maxNode(int depth, int parentMax)
+	private int minNode(int depth, int parentMin)
 	{
-		//System.out.println("min");
+		//System.out.println("max");
 		if (depth <= 0)
 		{
-			return winner();
+			return winner(myID);
 		}
+		//int max = MAX;
 		int min = MAX;
 		
 		for (int i = 0; i < b[0].length; i++)
 		{
 			if (b[0][i] == -1) //then not full
 			{
-				addPiece(i, p.getID());
-				int strength = minNode(depth-1, min);
-				if (strength < parentMax)
+				addPiece(i, myID);
+				int strength = maxNode(depth-1, min);
+				if (strength < parentMin)
 				{
 					removePiece(i);
-					return strength;
+					min = strength;
 				}
-				if(strength < min)
+				/*if(strength < min)
                 {
                     min = strength;
-                }
+                }*/
 				removePiece(i);
 			}
 		}
 		return min;
 	}
 	
-	private int winner()
+	
+	
+	private int winner(int player)
 	{
 		for (int i = 0; i < b.length; i++)
 		{
@@ -163,19 +166,41 @@ public class ExpertStrategy implements Strategy
 			{
 				if (i == 0 || j == 0)
 				{
-					if (this.p.getID() == board.checkWinner(i, j, 4, b))
+					//System.out.print("("+i+","+j+")");
+					int [] winner = board.checkWinner(i, j, 4, b, false);
+					if (winner[0] > 0) //make sure that there was a 4 in a row
 					{
-						//System.out.println("possible winner");
-						return MAX;
-					}
-					else if (((this.p.getID()+1)%2) == board.checkWinner(i, j, 4, b))
-					{
-						//System.out.println("possible winner1");
-						return MIN;
+						if (myID != player && player == winner[1]) //block the win
+						{
+							System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+							return MIN;
+						}
+						else if (myID == player && player == winner[1])
+						{
+							System.out.println("possible winner*************************************");
+							return MAX;
+						}
 					}
 				}
 			}
 		}
-		return 0;
+		//System.out.println();
+		return MIN;
+	}
+
+	@Override
+	public void run()
+	{
+		// TODO Auto-generated method stub
+		int move = 4;
+		
+		do 
+		{
+			move = minimax(board.getBoard(), 2);
+			System.out.println("trying expert move " + move);
+			
+		} while (board.setSpace(move) == 1);
+		
+		System.out.println("exiting out of settings a piece");
 	}
 }

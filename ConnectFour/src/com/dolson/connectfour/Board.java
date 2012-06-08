@@ -12,13 +12,13 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 
-public class Board extends View implements OnClickListener
+public class Board extends View implements OnClickListener, Runnable
 {
 	private int[][] board;
 	private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 	private int placeChecker;
 	private float diameter;
-	private int space = 4;
+	private int space = 3;
 	private int oldSpace;
 	private final float dropSpeed = (float)0.25;
 	private float yValue;
@@ -41,7 +41,7 @@ public class Board extends View implements OnClickListener
 		
 		this.resetBoard();
 			
-		p0 = new Player("test1", 0, 1, this);
+		p0 = new Player("test1", 0, 0, this);
 		p1 = new Player("test2", 1, 3, this);
 		this.notifyPlayerTurn();
 	}
@@ -121,14 +121,28 @@ public class Board extends View implements OnClickListener
 	    		dropToken = false;
 	    		if (!isWinner)
 	    		{
-	    			playerTurn = (playerTurn+1)%2;
 	    			this.notifyPlayerTurn();
+	    			/*Thread thread = new Thread();
+	    			try
+					{
+	    				while (!dropToken)
+	    				{
+	    					thread.sleep(4000);
+	    				}
+					} catch (InterruptedException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}*/
+	    			this.invalidate();
 	    		}
 	    		
 	    	}
 	    	
+	    	//System.out.println("invalidating");
 	    	//canvas.drawBitmap(boardImage, 0, orientedHeight - boardImage.getHeight(), paint);
 	    	this.invalidate();
+	    	//System.out.println("success invalidating");
 	    }
 	    
 	    
@@ -160,7 +174,7 @@ public class Board extends View implements OnClickListener
 		//otherwise, check to see if anybody won
 		else
 		{
-			if (checkWinner(row, col, 4, board) > 0)
+			if (checkWinner(row, col, 4, board, true)[0] > 0)
 			{
 				CharSequence text = "Winner! Winner! Winner!   " + this.getPlayer(playerTurn).getName();
 				int duration = Toast.LENGTH_SHORT;
@@ -176,11 +190,11 @@ public class Board extends View implements OnClickListener
 	 * 1 - Player one won
 	 * 2 - Player 2 won
 	 */
-	protected int checkWinner(int row, int col, int inarow, int[][] temp)
+	protected int[] checkWinner(int row, int col, int inarow, int[][] temp, boolean state)
 	{
 		int tempRow = row;
 		int tempCol = col;
-		int matched = 0;
+		int[] matched = {0,0};
 		
 		//check horizontal
 		int p = -1;
@@ -205,7 +219,8 @@ public class Board extends View implements OnClickListener
 			//we have a winner
 			if (count == inarow)
 			{
-				matched = 1;
+				matched[0] = 1;
+				matched[1] = p;
 			}
 		}
 		
@@ -231,7 +246,8 @@ public class Board extends View implements OnClickListener
 			//check to see if we have 4 in a row
 			if (count == inarow)
 			{
-				matched = 2;
+				matched[0] = 2;
+				matched[1] = p;
 			}
 		}
 		
@@ -270,7 +286,8 @@ public class Board extends View implements OnClickListener
 			//check to see if we have a winner
 			if (count == inarow)
 			{
-				matched = 3;
+				matched[0] = 3;
+				matched[1] = p;
 			}
 			
 			tempRow--;
@@ -310,17 +327,21 @@ public class Board extends View implements OnClickListener
 			//check to see if we have a winner
 			if (count == inarow)
 			{
-				matched = 4;
+				matched[0] = 4;
+				matched[1] = p;
 			}
 			
 			tempRow++;
 			tempCol++;
 		}
 
-		if (matched > 0)
+		if (matched[0] > 0)
 		{
 			if (inarow == 4)
-				isWinner = true;
+			{
+				isWinner = state;
+				System.out.println("is Winner == true");
+			}
 			return matched;
 		}
 		else
@@ -350,6 +371,7 @@ public class Board extends View implements OnClickListener
 		//if a token is already being dropped, dont let the person change while its dropping
 		//also if there is a winner, don't let there be any more input
 		//also if the computer is playing, we dont get any input
+		//System.out.println(me.getAction());
 		if (!dropToken && !isWinner && this.getPlayer(playerTurn).isHuman())
 		{
 			float xloc = me.getX();
@@ -417,6 +439,7 @@ public class Board extends View implements OnClickListener
 				}
 				else
 				{
+					System.out.println("placing a piece here   " + i);
 					oldSpace = i;
 					space = i;
 					dropToken = true;
@@ -424,7 +447,11 @@ public class Board extends View implements OnClickListener
 				}
 			}
 			else
+			{
+				System.out.println("not a good move");
 				return 1;
+			}
+				
 		}
 		return 0;
 	}
@@ -436,13 +463,13 @@ public class Board extends View implements OnClickListener
 	
 	protected void notifyPlayerTurn()
 	{
+		playerTurn = (playerTurn+1)%2;
 		this.getPlayer(playerTurn).notifyTurn();
 	}
 	
 	@Override
 	public void onClick(View v)
 	{
-		// TODO Auto-generated method stub
 		
 	}
 	
@@ -453,12 +480,15 @@ public class Board extends View implements OnClickListener
 			for (int j = 0; j < board[0].length; j++)
 				board[i][j] = -1;
 		
+		board[5][0] = 1;
+		board[4][0] = 1;
+		board[5][3] = 0;
+		board[4][3] = 0;
 		isWinner = false;
 		placeChecker = -1;
-		space = 4;
+		space = 3;
 		dropToken = false;
-		isWinner = false;
-		playerTurn = 0;
+		playerTurn = -1;
 	}
 	
 	public int[][] getBoard()
@@ -470,4 +500,44 @@ public class Board extends View implements OnClickListener
 	{
 		return isWinner;
 	}
+	
+	public boolean getDropToken()
+	{
+		return dropToken;
+	}
+
+	@Override
+	public void run()
+	{
+		
+	}
+
+/*	@Override
+	public void run()
+	{
+		
+		while (!isGameOver() && !dropToken)
+		{
+			try
+			{
+				Thread.sleep(1000);
+			} catch (InterruptedException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Board.this.findViewById(R.id.main_view).post(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					LinearLayout main = (LinearLayout)Board.this.findViewById(R.id.board_view);
+					main.invalidate();
+				}
+				
+			});
+		}
+	}*/
+	
+	
 }

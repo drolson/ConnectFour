@@ -3,6 +3,8 @@ package com.dolson.connectfour;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -10,10 +12,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Game extends Activity
+public class Game extends Activity implements Runnable
 {
 	private Board board;
 	private MenuInflater mi;
+	Thread t;
 	
 	
     /** Called when the activity is first created. */
@@ -23,6 +26,7 @@ public class Game extends Activity
         setContentView(R.layout.main);
         
         board = new Board(this);
+        new Thread(board).start();
         
         //set the players names along with the colors that they are
         TextView tv1 = (TextView)findViewById(R.id.player1);
@@ -34,7 +38,8 @@ public class Game extends Activity
         main.addView(board);
         board.setOnClickListener(board);
         
-       
+        t = new Thread(this);
+        t.start();
     }
     
     @Override
@@ -82,7 +87,14 @@ public class Game extends Activity
     	
     	//board info
     	
-    	
+    	try
+		{
+			t.wait();
+		} catch (InterruptedException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
     @Override
@@ -97,6 +109,7 @@ public class Game extends Activity
     	board.getPlayer(1).setStrat(state.getInt("strat1"));
     	
     	//board info
+    	t.notify();
     }
     
     @Override
@@ -142,4 +155,47 @@ public class Game extends Activity
 		board.invalidate();
 		board.notifyPlayerTurn();
     }
+    
+    public Handler updateHandler = new Handler(){
+        /** Gets called on every message that is received */
+        // @Override
+        public void handleMessage(Message msg) {
+            //board.update();
+            board.invalidate();
+            super.handleMessage(msg);
+        }
+    };
+
+
+	@Override
+	public void run()
+	{
+		while (!board.isGameOver())
+		{
+			
+			try
+			{
+				Thread.sleep(1000);
+			} catch (InterruptedException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			if (board.getDropToken())
+			{
+				System.out.println("trying to invalidate");
+				Game.this.updateHandler.sendEmptyMessage(0);
+			}
+		}
+		
+		System.out.println("game is now over ");
+		System.exit(0);
+		
+	}
+    
+   
+
 }
+
+
