@@ -42,7 +42,7 @@ public class Board extends View implements OnClickListener
 		this.resetBoard();
 			
 		p0 = new Player("test1", 0, 1, this);
-		p1 = new Player("test2", 1, 1, this);
+		p1 = new Player("test2", 1, 3, this);
 		this.notifyPlayerTurn();
 	}
 
@@ -160,7 +160,7 @@ public class Board extends View implements OnClickListener
 		//otherwise, check to see if anybody won
 		else
 		{
-			if (checkWinner(row, col, 4) > 0)
+			if (checkWinner(row, col, 4, board) > 0)
 			{
 				CharSequence text = "Winner! Winner! Winner!   " + this.getPlayer(playerTurn).getName();
 				int duration = Toast.LENGTH_SHORT;
@@ -176,7 +176,7 @@ public class Board extends View implements OnClickListener
 	 * 1 - Player one won
 	 * 2 - Player 2 won
 	 */
-	protected int checkWinner(int row, int col, int inarow)
+	protected int checkWinner(int row, int col, int inarow, int[][] temp)
 	{
 		int tempRow = row;
 		int tempCol = col;
@@ -185,15 +185,15 @@ public class Board extends View implements OnClickListener
 		//check horizontal
 		int p = -1;
 		int count = 0;
-		for (int j = 0; j < board[row].length; j++)
+		for (int j = 0; j < temp[row].length; j++)
 		{
-			if (board[row][j] != -1)
+			if (temp[row][j] != -1)
 			{
-				if (board[row][j] == p)
+				if (temp[row][j] == p)
 					count++;
 				else
 				{
-					p = board[row][j];
+					p = temp[row][j];
 					count = 1;
 				}
 			}
@@ -213,17 +213,17 @@ public class Board extends View implements OnClickListener
 		//check vertical
 		count = 0;
 		p = -1;
-		for (int j = board.length-1; j >= 0; j--)
+		for (int j = temp.length-1; j >= 0; j--)
 		{
-			if (board[j][col] == -1)
+			if (temp[j][col] == -1)
 				break;
 			else
 			{
-				if (board[j][col] == p)
+				if (temp[j][col] == p)
 					count++;
 				else
 				{
-					p = board[j][col];
+					p = temp[j][col];
 					count = 1;
 				}
 			}
@@ -239,7 +239,7 @@ public class Board extends View implements OnClickListener
 		//check forwardslash
 		count = 0;
 		p = -1;
-		while (tempRow < board.length && tempCol >= 0)
+		while (tempRow < temp.length && tempCol >= 0)
 		{
 			tempRow++;
 			tempCol--;
@@ -249,20 +249,20 @@ public class Board extends View implements OnClickListener
 
 		//now we are at the most bottom left place as possible with that piece placement
 		
-		while (tempRow >= 0 && tempCol < board[0].length)
+		while (tempRow >= 0 && tempCol < temp[0].length)
 		{
-			if (board[tempRow][tempCol] == -1)
+			if (temp[tempRow][tempCol] == -1)
 			{
 				count = 0;
 				p = -1;
 			}
 			else
 			{
-				if (board[tempRow][tempCol] == p)
+				if (temp[tempRow][tempCol] == p)
 					count++;
 				else
 				{
-					p = board[tempRow][tempCol];
+					p = temp[tempRow][tempCol];
 					count = 1;
 				}
 			}
@@ -289,20 +289,20 @@ public class Board extends View implements OnClickListener
 			tempCol--;
 		}
 
-		while (tempRow < board.length && tempCol < board[0].length)
+		while (tempRow < temp.length && tempCol < temp[0].length)
 		{
-			if (board[tempRow][tempCol] == -1)
+			if (temp[tempRow][tempCol] == -1)
 			{
 				count = 0;
 				p = -1;
 			}
 			else
 			{
-				if (board[tempRow][tempCol] == p)
+				if (temp[tempRow][tempCol] == p)
 					count++;
 				else
 				{
-					p = board[tempRow][tempCol];
+					p = temp[tempRow][tempCol];
 					count = 1;
 				}
 			}
@@ -464,5 +464,10 @@ public class Board extends View implements OnClickListener
 	public int[][] getBoard()
 	{
 		return board;
+	}
+	
+	public boolean isGameOver()
+	{
+		return isWinner;
 	}
 }

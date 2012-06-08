@@ -22,7 +22,7 @@ public class Game extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        board = new Board(this); 
+        board = new Board(this);
         
         //set the players names along with the colors that they are
         TextView tv1 = (TextView)findViewById(R.id.player1);
@@ -34,6 +34,7 @@ public class Game extends Activity
         main.addView(board);
         board.setOnClickListener(board);
         
+       
     }
     
     @Override

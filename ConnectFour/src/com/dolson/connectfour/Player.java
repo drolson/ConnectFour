@@ -18,7 +18,7 @@ public class Player
 		this.setStrategy(strat);
 	}
 	
-	protected String getName()
+	public String getName()
 	{
 		return name;
 	}

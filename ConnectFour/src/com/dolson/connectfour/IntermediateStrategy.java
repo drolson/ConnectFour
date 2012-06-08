@@ -22,5 +22,4 @@ public class IntermediateStrategy implements Strategy
 			
 		} while (board.setSpace(move) == 1);
 	}
-
 }
