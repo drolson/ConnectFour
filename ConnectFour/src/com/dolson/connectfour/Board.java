@@ -463,6 +463,7 @@ public class Board extends View implements OnClickListener, Runnable
 	
 	protected void notifyPlayerTurn()
 	{
+		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 		playerTurn = (playerTurn+1)%2;
 		this.getPlayer(playerTurn).notifyTurn();
 	}
@@ -482,8 +483,40 @@ public class Board extends View implements OnClickListener, Runnable
 		
 		board[5][0] = 1;
 		board[4][0] = 1;
+		board[3][0] = 1;
+		board[2][0] = 0;
+		board[1][0] = 1;
+		board[0][0] = 1;
+		
+		board[5][2] = 1;
+		board[4][2] = 1;
+		board[3][2] = 0;
+		board[2][2] = 1;
+		board[1][2] = 0;
+		
 		board[5][3] = 0;
 		board[4][3] = 0;
+		board[3][3] = 0;
+		board[2][3] = 1;
+		//board[1][3] = 0;
+		
+		board[5][4] = 0;
+		board[4][4] = 0;
+		board[3][4] = 1;
+		board[2][4] = 0;
+		
+		board[5][5] = 0;
+		board[4][5] = 0;
+		board[3][5] = 0;
+		board[2][5] = 1;
+		board[1][5] = 0;
+		
+		board[5][6] = 1;
+		board[4][6] = 1;
+		board[3][6] = 0;
+		board[2][6] = 1;
+		
+		
 		isWinner = false;
 		placeChecker = -1;
 		space = 3;
