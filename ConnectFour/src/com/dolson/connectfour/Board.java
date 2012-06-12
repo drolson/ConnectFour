@@ -481,7 +481,7 @@ public class Board extends View implements OnClickListener, Runnable
 			for (int j = 0; j < board[0].length; j++)
 				board[i][j] = -1;
 		
-		board[5][0] = 1;
+		/*board[5][0] = 1;
 		board[4][0] = 1;
 		board[3][0] = 1;
 		board[2][0] = 0;
@@ -514,7 +514,7 @@ public class Board extends View implements OnClickListener, Runnable
 		board[5][6] = 1;
 		board[4][6] = 1;
 		board[3][6] = 0;
-		board[2][6] = 1;
+		board[2][6] = 1;*/
 		
 		
 		isWinner = false;

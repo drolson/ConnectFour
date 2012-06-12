@@ -14,7 +14,7 @@ public class ExpertStrategy implements Strategy
 	int lastRow = 0;
 	int lastCol = 0;
 	int index;
-	private final int mainDepth = 3;
+	private final int mainDepth = 4;
 	
 	public ExpertStrategy(Player p)
 	{
@@ -164,7 +164,7 @@ public class ExpertStrategy implements Strategy
 		return min;
 	}*/
 	
-	private int minimax(int[][] tb, int depth, int player)
+	/*private int minimax(int[][] tb, int depth, int player)
 	{
 		if (board.checkWinner(lastRow, lastCol, 4, b, false)[0] > 0 || depth <= 0)
 		{
@@ -177,7 +177,7 @@ public class ExpertStrategy implements Strategy
 		
 		for (int i = 0; i < b[0].length; i++)
 		{
-			if (b[0][i] == -1) //see if its full or not
+			if (b[0][i] == -1) //then not full
 			{
 				System.out.println("trying move in " + i + "   " + depth);
 				this.addPiece(i, player%2);
@@ -193,6 +193,54 @@ public class ExpertStrategy implements Strategy
 			}
 		}
 		return max;	
+	}*/
+	
+	private int minimax(int depth, int player)
+	{
+		if (depth <= 0) //invalid call to function
+			return -1;
+				
+		return maximize(depth, player);
+	}
+	
+	private int maximize(int depth, int player)
+	{
+		if (depth == 0)
+			return winner(player);
+					
+		int index = 3;
+		int max = MIN;
+		
+		for (int i = 0; i < b[0].length; i++)
+		{
+			if (b[0][i] == -1) //then this could be a valid move
+			{
+				
+			}
+		}
+		
+		return -1;
+	}
+	
+	private int minimize(int depth, int player)
+	{
+		if (depth == 0)
+			return winner(player);
+		
+		int index = 3;
+		int min = MAX;
+		
+		for (int i = 0; i < b[0].length; i++)
+		{
+			if (b[0][i] == -1) //then this could be a valid move
+			{
+				
+			}
+		}
+		
+		
+		
+		return -1;
 	}
 	
 	private int winner(int player)
@@ -230,7 +278,7 @@ public class ExpertStrategy implements Strategy
 	public void run()
 	{
 		// TODO Auto-generated method stub
-		int move = 4;
+		int move;
 		
 		//do 
 		//{
@@ -248,8 +296,9 @@ public class ExpertStrategy implements Strategy
 				}
 			}
 			//System.out.println("Trying a new area");
-			move = minimax(b, mainDepth, myID);
-			move = index;
+			//move = minimax(b, mainDepth, myID);
+			//move = index;
+			move = minimax(mainDepth, myID);
 			System.out.println("trying expert move " + move);
 			
 		//} while (board.setSpace(move) == 1);
