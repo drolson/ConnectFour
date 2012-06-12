@@ -14,7 +14,7 @@ public class ExpertStrategy implements Strategy
 	int lastRow = 0;
 	int lastCol = 0;
 	int index;
-	private final int mainDepth = 4;
+	private final int mainDepth = 2;
 	
 	public ExpertStrategy(Player p)
 	{
@@ -199,14 +199,28 @@ public class ExpertStrategy implements Strategy
 	{
 		if (depth <= 0) //invalid call to function
 			return -1;
-				
+			
+		int index = 3;
+		int max = MAX;
+		for (int i = 0; i < b[0].length; i++)
+		{
+			if (b[0][i] == -1) //then this could be a valid move
+			{
+				int value = minimize(depth-1, player+1);
+				if (value < max)
+				{
+					index = i;
+					max = value;
+				}
+			}
+		}
 		return maximize(depth, player);
 	}
 	
 	private int maximize(int depth, int player)
 	{
-		if (depth == 0)
-			return winner(player);
+		if (depth == 0 || checkWinner()[0] > 0) //if depth == 0 or leaf node
+			return winner((player+1)%2);
 					
 		int index = 3;
 		int max = MIN;
@@ -215,17 +229,24 @@ public class ExpertStrategy implements Strategy
 		{
 			if (b[0][i] == -1) //then this could be a valid move
 			{
-				
+				addPiece(i, player%2);
+				int value = minimize(depth-1, player+1);
+				if (value > max)
+				{
+					index = i;
+					value = max;
+				}
+				removePiece(i);
 			}
 		}
 		
-		return -1;
+		return max;
 	}
 	
 	private int minimize(int depth, int player)
 	{
-		if (depth == 0)
-			return winner(player);
+		if (depth == 0 || checkWinner()[0] > 0) //if depth == 0 or leaf node
+			return winner((player+1)%2);
 		
 		int index = 3;
 		int min = MAX;
@@ -234,46 +255,61 @@ public class ExpertStrategy implements Strategy
 		{
 			if (b[0][i] == -1) //then this could be a valid move
 			{
-				
+				addPiece(i, player%2);
+				int value = maximize(depth-1,player+1);
+				if (value < min)
+				{
+					index = i;
+					min = value;
+				}
+				removePiece(i);
 			}
 		}
 		
 		
 		
-		return -1;
+		return min;
 	}
 	
 	private int winner(int player)
 	{
+		int [] winner = checkWinner();
+		if (winner[0] > 0) //make sure that there was a 4 in a row
+		{
+			if (myID != player && player == winner[1]) //block the win
+			{
+				System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+				return MIN;
+			}
+			else if (myID == player && player == winner[1]) //take the win
+			{
+				System.out.println("possible winner*************************************");
+				return MAX;
+			}
+			//return MAX;
+		}	
+		//System.out.println();
+		return 0;
+	}
+
+	private int[] checkWinner()
+	{
+		int[] t = {-1,-1};
 		for (int i = 0; i < b.length; i++)
 		{
 			for (int j = 0; j < b[i].length; j++)
 			{
 				if (i == 0 || j == 0 || i == b.length-1)
 				{
-					//System.out.print("("+i+","+j+")");
 					int [] winner = board.checkWinner(i, j, 4, b, false);
-					if (winner[0] > 0) //make sure that there was a 4 in a row
-					{
-						if (myID != player && player == winner[1]) //block the win
-						{
-							System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-							return MIN;
-						}
-						else if (myID == player && player == winner[1]) //take the win
-						{
-							System.out.println("possible winner*************************************");
-							return MAX;
-						}
-						//return MAX;
-					}
+					if (winner[0] > 0)
+						return winner;
 				}
 			}
 		}
-		//System.out.println();
-		return 0;
+		return t;
 	}
-
+	
 	@Override
 	public void run()
 	{

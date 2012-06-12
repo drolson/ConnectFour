@@ -515,7 +515,12 @@ public class Board extends View implements OnClickListener, Runnable
 		board[4][6] = 1;
 		board[3][6] = 0;
 		board[2][6] = 1;*/
-		
+		board[5][3] = 0;
+		board[5][2] = 0;
+		//board[5][1] = 0;
+		board[4][3] = 1;
+		board[4][2] = 1;
+		//board
 		
 		isWinner = false;
 		placeChecker = -1;
