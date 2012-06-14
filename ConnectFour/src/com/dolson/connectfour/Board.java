@@ -30,8 +30,11 @@ public class Board extends View implements OnClickListener, Runnable
     int orientedHeight;
     float actualWidth = 728;
     float actualHeight = 624;
+    
 	Bitmap boardImage = BitmapFactory.decodeResource(getResources(), R.drawable.board);
-		
+	
+	final int debug = 0;
+	
 	private Player p0;
 	private Player p1;
 	
@@ -41,7 +44,7 @@ public class Board extends View implements OnClickListener, Runnable
 		
 		this.resetBoard();
 			
-		p0 = new Player("test1", 0, 0, this);
+		p0 = new Player("drew", 0, 0, this);
 		p1 = new Player("test2", 1, 3, this);
 		this.notifyPlayerTurn();
 	}
@@ -340,6 +343,7 @@ public class Board extends View implements OnClickListener, Runnable
 			if (inarow == 4)
 			{
 				isWinner = state;
+				if (debug == 1)
 				System.out.println("is Winner == true");
 			}
 			return matched;
@@ -439,6 +443,7 @@ public class Board extends View implements OnClickListener, Runnable
 				}
 				else
 				{
+					if (debug == 1)
 					System.out.println("placing a piece here   " + i);
 					oldSpace = i;
 					space = i;
@@ -448,6 +453,7 @@ public class Board extends View implements OnClickListener, Runnable
 			}
 			else
 			{
+				if (debug == 1)
 				System.out.println("not a good move");
 				return 1;
 			}
@@ -463,6 +469,7 @@ public class Board extends View implements OnClickListener, Runnable
 	
 	protected void notifyPlayerTurn()
 	{
+		if (debug == 1)
 		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 		playerTurn = (playerTurn+1)%2;
 		this.getPlayer(playerTurn).notifyTurn();
@@ -515,11 +522,8 @@ public class Board extends View implements OnClickListener, Runnable
 		board[4][6] = 1;
 		board[3][6] = 0;
 		board[2][6] = 1;*/
-		board[5][3] = 0;
-		board[5][2] = 0;
-		//board[5][1] = 0;
-		board[4][3] = 1;
-		board[4][2] = 1;
+	
+		
 		//board
 		
 		isWinner = false;

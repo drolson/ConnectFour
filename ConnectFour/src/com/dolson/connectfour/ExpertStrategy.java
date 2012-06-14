@@ -4,8 +4,8 @@ public class ExpertStrategy implements Strategy
 {
 	Board board;
 	Player p;
-	private final int MAX = Integer.MAX_VALUE;
-	private final int MIN = MAX*-1;
+	private final int MAX = 100;
+	private final int MIN = -1*MAX;
 	//int [][] tb = new int[6][7];
 	int [][] b = new int[6][7];
 	int myID;
@@ -14,7 +14,8 @@ public class ExpertStrategy implements Strategy
 	int lastRow = 0;
 	int lastCol = 0;
 	int index;
-	private final int mainDepth = 2;
+	final int debug = 0;
+	private final int mainDepth = 5;
 	
 	public ExpertStrategy(Player p)
 	{
@@ -201,72 +202,91 @@ public class ExpertStrategy implements Strategy
 			return -1;
 			
 		int index = 3;
-		int max = MAX;
+		int max = Integer.MIN_VALUE;
 		for (int i = 0; i < b[0].length; i++)
 		{
 			if (b[0][i] == -1) //then this could be a valid move
 			{
-				int value = minimize(depth-1, player+1);
-				if (value < max)
+				
+				addPiece(i, player);
+				if (debug == 1)
+				System.out.println(depth + " trying a piece at: " + i);
+				int value = maximize(depth-1, player+1);
+				if (value > max)
 				{
 					index = i;
+					if (debug == 1)
+					System.out.println("found a good index value: " + index);
 					max = value;
 				}
+				removePiece(i);
 			}
+			if (debug == 1)
+			System.out.println("depth: " + depth + "     gives us this score: " + max + "     for this index: " + i);
 		}
-		return maximize(depth, player);
+		
+		return index;
 	}
 	
 	private int maximize(int depth, int player)
 	{
 		if (depth == 0 || checkWinner()[0] > 0) //if depth == 0 or leaf node
-			return winner((player+1)%2);
+			return (depth+1)*winner((player+1)%2);
 					
-		int index = 3;
-		int max = MIN;
+		//int index = 3;
+		int max = 0;
 		
 		for (int i = 0; i < b[0].length; i++)
 		{
 			if (b[0][i] == -1) //then this could be a valid move
 			{
+				//max = 0;
 				addPiece(i, player%2);
+				if (debug == 1)
+				System.out.println(depth+" trying a piece at: " + i);
 				int value = minimize(depth-1, player+1);
-				if (value > max)
-				{
-					index = i;
-					value = max;
-				}
+				//if (value < max)
+				//{
+				//	System.out.println("we found a MIN value " + value);
+				//	max = value;
+				//}
+				max += value;
+				if (debug == 1)
+				System.out.println(depth+" trying a piece at: " + i + "      score: " + max);
 				removePiece(i);
 			}
 		}
-		
+	
 		return max;
 	}
 	
 	private int minimize(int depth, int player)
 	{
 		if (depth == 0 || checkWinner()[0] > 0) //if depth == 0 or leaf node
-			return winner((player+1)%2);
+			return (depth+1)*winner((player+1)%2);
 		
-		int index = 3;
-		int min = MAX;
+		//int index = 3;
+		int min = 0;
 		
 		for (int i = 0; i < b[0].length; i++)
 		{
 			if (b[0][i] == -1) //then this could be a valid move
 			{
 				addPiece(i, player%2);
+				if (debug == 1)
+				System.out.println(depth+" trying a piece at: " + i);
 				int value = maximize(depth-1,player+1);
-				if (value < min)
+				/*if (value > min)
 				{
-					index = i;
+					//index = i;
 					min = value;
-				}
+				}*/
+				min += value;
+				if (debug == 1)
+				System.out.println(depth+" trying a piece at: " + i + "      score: " + min);
 				removePiece(i);
 			}
 		}
-		
-		
 		
 		return min;
 	}
@@ -278,11 +298,13 @@ public class ExpertStrategy implements Strategy
 		{
 			if (myID != player && player == winner[1]) //block the win
 			{
+				if (debug == 1)
 				System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 				return MIN;
 			}
 			else if (myID == player && player == winner[1]) //take the win
 			{
+				if (debug == 1)
 				System.out.println("possible winner*************************************");
 				return MAX;
 			}
@@ -335,12 +357,13 @@ public class ExpertStrategy implements Strategy
 			//move = minimax(b, mainDepth, myID);
 			//move = index;
 			move = minimax(mainDepth, myID);
+			if (debug == 1)
 			System.out.println("trying expert move " + move);
 			
 		//} while (board.setSpace(move) == 1);
 			if (board.setSpace(move) == 1)
 				System.exit(0);
-		
+			if (debug == 1)
 		System.out.println("exiting out of settings a piece");
 	}
 }
