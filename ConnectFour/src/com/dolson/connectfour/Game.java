@@ -189,8 +189,8 @@ public class Game extends Activity implements Runnable
 			}
 		}
 		
-		System.out.println("game is now over ");
-		System.exit(0);
+		//System.out.println("game is now over ");
+		//System.exit(0);
 		
 	}
     
