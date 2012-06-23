@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.dolson.attachfour.R;
 
 public class Game extends Activity implements Runnable
 {

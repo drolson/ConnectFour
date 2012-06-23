@@ -1,5 +1,7 @@
 package com.dolson.connectfour;
 
+import com.dolson.attachfour.R;
+
 
 public class Player
 {

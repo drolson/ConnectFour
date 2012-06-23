@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
+import com.dolson.attachfour.R;
 
 public class Board extends View implements OnClickListener, Runnable
 {
@@ -44,7 +45,7 @@ public class Board extends View implements OnClickListener, Runnable
 		
 		this.resetBoard();
 			
-		p0 = new Player("drew", 0, 0, this);
+		p0 = new Player("drew", 0, 2, this);
 		p1 = new Player("test2", 1, 3, this);
 		this.notifyPlayerTurn();
 	}

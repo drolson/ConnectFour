@@ -1,11 +1,13 @@
 package com.dolson.connectfour;
 
+import com.dolson.attachfour.R;
+
 public class IntermediateStrategy implements Strategy
 {
 	Board board;
 	Player p;
-	private final int MAX = Integer.MAX_VALUE;
-	private final int MIN = MAX*-1;
+	private final int MAX = 100;
+	private final int MIN = -1*MAX;
 	//int [][] tb = new int[6][7];
 	int [][] b = new int[6][7];
 	int myID;
@@ -14,7 +16,8 @@ public class IntermediateStrategy implements Strategy
 	int lastRow = 0;
 	int lastCol = 0;
 	int index;
-	private final int mainDepth = 2;
+	final int debug = 1;
+	private final int mainDepth = 3;
 	
 	public IntermediateStrategy(Player p)
 	{
@@ -58,179 +61,226 @@ public class IntermediateStrategy implements Strategy
 		}
 	}
 	
-	/*private int minimax(int [][] tb, int depth)
+	private int minimax(int depth, int player)
 	{
-		//low level copy of the board, so we dont actually edit the board
-		for (int i = 0; i < tb.length; i++)
-		{
-			for (int j = 0; j < tb[i].length; j++)
-			{
-				if (tb[i][j] == -1)
-					b[i][j] = -1;
-				else if (tb[i][j] == 0)
-					b[i][j] = 0;
-				else if (tb[i][j] == 1)
-					b[i][j] = 1;
-			}
-		}
-		
-		if (depth <= 0) //invalid call to the function
-		{
+		if (depth <= 0) //invalid call to function
 			return -1;
-		}
-		
-		int max = MIN;
-		int index = 0; //start at center column
-		
+			
+		int index = 3;
+		int max = Integer.MIN_VALUE;
 		for (int i = 0; i < b[0].length; i++)
 		{
-			if (b[0][i] == -1) //then not full
+			if (b[0][i] == -1) //then this could be a valid move
 			{
-				addPiece(i, myID);
-				int strength = maxNode(depth-1, max);
-				System.out.println("strength for " + i + " is: " + strength);
-				if (strength > max)
+				
+				addPiece(i, player);
+				if (debug == 1)
+					System.out.println(depth + " trying a piece at: " + i);
+				int value = maximize(depth-1, player+1);
+				if (value > max)
 				{
 					index = i;
-					max = strength;
-					System.out.println("chaning the index value");
+					if (debug == 1)
+						System.out.println("found a good index value: " + index);
+					max = value;
 				}
 				removePiece(i);
 			}
+			if (debug == 1)
+				System.out.println("depth: " + depth + "     gives us this score: " + max + "     for this index: " + i);
 		}
 		
 		return index;
 	}
 	
-	private int maxNode(int depth, int parentMax)
+	private int maximize(int depth, int player)
 	{
-		//System.out.println("min");
-		if (depth <= 0)
-		{
-			return winner(otherID);
-		}
-		//int min = MIN;
-		int max = MIN;
+		if (depth == 0 || checkWinner()[0] > 0) //if depth == 0 or leaf node
+			return (depth+1)*winner((player+1)%2);
+					
+		//int index = 3;
+		int max = 0;
 		
 		for (int i = 0; i < b[0].length; i++)
 		{
-			if (b[0][i] == -1) //then not full
+			if (b[0][i] == -1) //then this could be a valid move
 			{
-				addPiece(i, otherID);
-				int strength = minNode(depth-1, max);
-				if (strength > parentMax)
-				{
-					removePiece(i);
-					max = strength;
-				}
-				if(strength > max)
-                {
-                    max = strength;
-                }
+				//max = 0;
+				addPiece(i, player%2);
+				if (debug == 1)
+				System.out.println(depth+" trying a piece at: " + i);
+				int value = minimize(depth-1, player+1);
+				//if (value < max)
+				//{
+				//	System.out.println("we found a MIN value " + value);
+				//	max = value;
+				//}
+				max += value;
+				if (debug == 1)
+				System.out.println(depth+" trying a piece at: " + i + "      score: " + max);
 				removePiece(i);
 			}
 		}
+	
 		return max;
 	}
 	
-	private int minNode(int depth, int parentMin)
+	private int minimize(int depth, int player)
 	{
-		//System.out.println("max");
-		if (depth <= 0)
-		{
-			return winner(myID);
-		}
-		//int max = MAX;
-		int min = MAX;
+		if (depth == 0 || checkWinner()[0] > 0) //if depth == 0 or leaf node
+			return (depth+1)*winner((player+1)%2);
+		
+		//int index = 3;
+		int min = 0;
 		
 		for (int i = 0; i < b[0].length; i++)
 		{
-			if (b[0][i] == -1) //then not full
+			if (b[0][i] == -1) //then this could be a valid move
 			{
-				addPiece(i, myID);
-				int strength = maxNode(depth-1, min);
-				if (strength < parentMin)
+				addPiece(i, player%2);
+				if (debug == 1)
+				System.out.println(depth+" trying a piece at: " + i);
+				int value = maximize(depth-1,player+1);
+				if (value > min)
 				{
-					removePiece(i);
-					min = strength;
+					//index = i;
+					min = value;
 				}
-				if(strength < min)
-                {
-                    min = strength;
-                }
+				min += value;
+				if (debug == 1)
+				System.out.println(depth+" trying a piece at: " + i + "      score: " + min);
 				removePiece(i);
 			}
 		}
+		
+		return min;
+	}
+	
+	/*private int minimax(int depth, int player)
+	{
+		if (depth <= 0) //invalid call to function
+			return -1;
+			
+		int index = 3;
+		int max = Integer.MIN_VALUE;
+		for (int i = 0; i < b[0].length; i++)
+		{
+			if (b[0][i] == -1) //then this could be a valid move
+			{
+				
+				addPiece(i, player);
+				if (debug == 1)
+				System.out.println(depth + " trying a piece at: " + i);
+				int value = maximize(depth-1, player+1);
+				if (value > max)
+				{
+					index = i;
+					if (debug == 1)
+					System.out.println("found a good index value: " + index);
+					max = value;
+				}
+				removePiece(i);
+			}
+			if (debug == 1)
+			System.out.println("depth: " + depth + "     gives us this score: " + max + "     for this index: " + i);
+		}
+		
+		return index;
+	}
+	
+	private int maximize(int depth, int player)
+	{
+		if (depth == 0 || checkWinner()[0] > 0) //if depth == 0 or leaf node
+			return winner((player+1)%2);
+					
+		//int index = 3;
+		int max = Integer.MAX_VALUE;
+		
+		for (int i = 0; i < b[0].length; i++)
+		{
+			if (b[0][i] == -1) //then this could be a valid move
+			{
+				//max = 0;
+				addPiece(i, player%2);
+				int value = minimize(depth-1,player+1);
+				if (value < max)
+				{
+					max = value;
+				}
+				removePiece(i);
+			}
+		}
+	
+		return max;
+	}
+	
+	private int minimize(int depth, int player)
+	{
+		if (depth == 0 || checkWinner()[0] > 0) //if depth == 0 or leaf node
+			return winner((player+1)%2);
+		
+		//int index = 3;
+		int min = 0;
+		
+		for (int i = 0; i < b[0].length; i++)
+		{
+			if (b[0][i] == -1) //then this could be a valid move
+			{
+				addPiece(i, player%2);
+				
+				removePiece(i);
+			}
+		}
+		
 		return min;
 	}*/
 	
-	private int minimax(int[][] tb, int depth, int player)
-	{
-		if (board.checkWinner(lastRow, lastCol, 4, b, false)[0] > 0 || depth <= 0)
-		{
-			System.out.println("WE ARE AT DEPTH 0");
-			int win = winner ((player+1)%2);
-			System.out.println("       winning score is: " + win);
-			return win;
-		}
-		int max = MIN;
-		
-		for (int i = 0; i < b[0].length; i++)
-		{
-			if (b[0][i] == -1) //then not full
-			{
-				System.out.println("trying move in " + i + "   " + depth);
-				this.addPiece(i, player%2);
-				int temp = Math.max(max, -1*minimax(b, depth -1, player+1));
-				System.out.println("possible value is " + temp + "    vs max: " + max);
-				if (temp > max)// && depth == mainDepth)
-				{
-					index = i;
-					max = temp;
-					System.out.println("              so far best index is " + index);
-				}
-				removePiece(i);
-			}
-		}
-		return max;	
-	}
-	
 	private int winner(int player)
 	{
+		int [] winner = checkWinner();
+		if (winner[0] > 0) //make sure that there was a 4 in a row
+		{
+			if (myID != player && player == winner[1]) //block the win
+			{
+				if (debug == 1)
+				System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+				return MIN;
+			}
+			else if (myID == player && player == winner[1]) //take the win
+			{
+				if (debug == 1)
+				System.out.println("possible winner*************************************");
+				return MAX;
+			}
+			//return MAX;
+		}	
+		//System.out.println();
+		return 0;
+	}
+
+	private int[] checkWinner()
+	{
+		int[] t = {-1,-1};
 		for (int i = 0; i < b.length; i++)
 		{
 			for (int j = 0; j < b[i].length; j++)
 			{
 				if (i == 0 || j == 0 || i == b.length-1)
 				{
-					//System.out.print("("+i+","+j+")");
 					int [] winner = board.checkWinner(i, j, 4, b, false);
-					if (winner[0] > 0) //make sure that there was a 4 in a row
-					{
-						if (myID != player && player == winner[1]) //block the win
-						{
-							System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-							return MIN;
-						}
-						else if (myID == player && player == winner[1]) //take the win
-						{
-							System.out.println("possible winner*************************************");
-							return MAX;
-						}
-						//return MAX;
-					}
+					if (winner[0] > 0)
+						return winner;
 				}
 			}
 		}
-		//System.out.println();
-		return 0;
+		return t;
 	}
-
+	
 	@Override
 	public void run()
 	{
 		// TODO Auto-generated method stub
-		int move = 4;
+		int move;
 		
 		//do 
 		//{
@@ -248,14 +298,16 @@ public class IntermediateStrategy implements Strategy
 				}
 			}
 			//System.out.println("Trying a new area");
-			move = minimax(b, mainDepth, myID);
-			move = index;
+			//move = minimax(b, mainDepth, myID);
+			//move = index;
+			move = minimax(mainDepth, myID);
+			if (debug == 1)
 			System.out.println("trying expert move " + move);
 			
 		//} while (board.setSpace(move) == 1);
 			if (board.setSpace(move) == 1)
 				System.exit(0);
-		
+			if (debug == 1)
 		System.out.println("exiting out of settings a piece");
 	}
 }

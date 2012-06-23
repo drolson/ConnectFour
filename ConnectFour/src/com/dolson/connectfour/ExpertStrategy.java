@@ -168,19 +168,19 @@ public class ExpertStrategy implements Strategy
 				
 				addPiece(i, player);
 				if (debug == 1)
-				System.out.println(depth + " trying a piece at: " + i);
+					System.out.println(depth + " trying a piece at: " + i);
 				int value = maximize(depth-1, player+1);
 				if (value > max)
 				{
 					index = i;
 					if (debug == 1)
-					System.out.println("found a good index value: " + index);
+						System.out.println("found a good index value: " + index);
 					max = value;
 				}
 				removePiece(i);
 			}
 			if (debug == 1)
-			System.out.println("depth: " + depth + "     gives us this score: " + max + "     for this index: " + i);
+				System.out.println("depth: " + depth + "     gives us this score: " + max + "     for this index: " + i);
 		}
 		
 		return index;
@@ -300,12 +300,12 @@ public class ExpertStrategy implements Strategy
 			//move = index;
 			move = minimax(mainDepth, myID);
 			if (debug == 1)
-			System.out.println("trying expert move " + move);
+				System.out.println("trying expert move " + move);
 			
 		//} while (board.setSpace(move) == 1);
 			if (board.setSpace(move) == 1)
 				System.exit(0);
 			if (debug == 1)
-		System.out.println("exiting out of settings a piece");
+					System.out.println("exiting out of settings a piece");
 	}
 }
