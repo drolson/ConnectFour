@@ -1,4 +1,4 @@
-package com.dolson.connectfour;
+package com.dolson.attachfour;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -31,6 +31,7 @@ public class Board extends View implements OnClickListener, Runnable
     int orientedHeight;
     float actualWidth = 728;
     float actualHeight = 624;
+    long l1;
     
 	Bitmap boardImage = BitmapFactory.decodeResource(getResources(), R.drawable.board);
 	
@@ -115,6 +116,7 @@ public class Board extends View implements OnClickListener, Runnable
 	    
 	    if (dropToken)
 	    {
+	    	l1 = System.nanoTime();
 	    	int row = getYValue(space);
 	    	canvas.drawCircle((space*diameter)+(radius)+(2*space+1)*spacing, (orientedHeight-(diameter*yValue))+radius-((5-row)*spacing*2), radius, paint);
 	    	
@@ -126,27 +128,14 @@ public class Board extends View implements OnClickListener, Runnable
 	    		if (!isWinner)
 	    		{
 	    			this.notifyPlayerTurn();
-	    			/*Thread thread = new Thread();
-	    			try
-					{
-	    				while (!dropToken)
-	    				{
-	    					thread.sleep(4000);
-	    				}
-					} catch (InterruptedException e)
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}*/
+
 	    			this.invalidate();
 	    		}
 	    		
 	    	}
-	    	
-	    	//System.out.println("invalidating");
-	    	//canvas.drawBitmap(boardImage, 0, orientedHeight - boardImage.getHeight(), paint);
+
+	    	System.out.println("TIME TO DRAW: " + (System.nanoTime()-l1));
 	    	this.invalidate();
-	    	//System.out.println("success invalidating");
 	    }
 	    
 	    
@@ -174,6 +163,10 @@ public class Board extends View implements OnClickListener, Runnable
 		if (!placedToken)
 		{
 			//do a toast message
+			int duration = Toast.LENGTH_SHORT;
+			CharSequence text = "The amount of tokens in this column is too damn high!";
+			Toast toast = Toast.makeText(super.getContext(), text, duration);
+			toast.show();
 		}
 		//otherwise, check to see if anybody won
 		else
@@ -553,34 +546,5 @@ public class Board extends View implements OnClickListener, Runnable
 	public void run()
 	{
 		
-	}
-
-/*	@Override
-	public void run()
-	{
-		
-		while (!isGameOver() && !dropToken)
-		{
-			try
-			{
-				Thread.sleep(1000);
-			} catch (InterruptedException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			Board.this.findViewById(R.id.main_view).post(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					LinearLayout main = (LinearLayout)Board.this.findViewById(R.id.board_view);
-					main.invalidate();
-				}
-				
-			});
-		}
-	}*/
-	
-	
+	}	
 }

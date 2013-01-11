@@ -1,4 +1,4 @@
-package com.dolson.connectfour;
+package com.dolson.attachfour;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -66,7 +66,7 @@ public class Game extends Activity implements Runnable
 	        	Intent intent = new Intent(this, SettingsActivity.class);
 	        	intent.putExtra("strat0", board.getPlayer(0).getStrat());
 	        	intent.putExtra("strat1", board.getPlayer(1).getStrat());
-	        	
+	        	System.out.println("about to fail");
 	        	startActivityForResult(intent, 0);
 	        	     	
 	        	return true;
@@ -85,17 +85,6 @@ public class Game extends Activity implements Runnable
     	state.putInt("strat1", board.getPlayer(1).getStrat());
     	state.putString("name0", board.getPlayer(0).getName());
     	state.putString("name1", board.getPlayer(1).getName());
-    	
-    	//board info
-    	
-    	try
-		{
-			t.wait();
-		} catch (InterruptedException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
     }
     
     @Override
@@ -108,9 +97,6 @@ public class Game extends Activity implements Runnable
     	board.getPlayer(1).setName(state.getString("name1"));
     	board.getPlayer(0).setStrat(state.getInt("strat0"));
     	board.getPlayer(1).setStrat(state.getInt("strat1"));
-    	
-    	//board info
-    	t.notify();
     }
     
     @Override
@@ -143,6 +129,7 @@ public class Game extends Activity implements Runnable
     			}
     		}
     		
+    		//create a new game if they changed any settings since at least one of the players would have changed.
     		if (i.getExtras().getBoolean("p0bool") || i.getExtras().getBoolean("p1bool"))
     		{
     			this.newGame();
@@ -162,6 +149,7 @@ public class Game extends Activity implements Runnable
         // @Override
         public void handleMessage(Message msg) {
             //board.update();
+        	System.out.println("Handling message now");
             board.invalidate();
             super.handleMessage(msg);
         }
@@ -173,9 +161,9 @@ public class Game extends Activity implements Runnable
 	{
 		while (!board.isGameOver())
 		{
-			
 			try
 			{
+				
 				Thread.sleep(1000);
 			} catch (InterruptedException e)
 			{
@@ -189,10 +177,6 @@ public class Game extends Activity implements Runnable
 				Game.this.updateHandler.sendEmptyMessage(0);
 			}
 		}
-		
-		//System.out.println("game is now over ");
-		//System.exit(0);
-		
 	}
     
    

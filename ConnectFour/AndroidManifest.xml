@@ -10,7 +10,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
         <activity
-            android:name="com.dolson.connectfour.Game"
+            android:name="com.dolson.attachfour.Game"
             android:label="@string/app_name" 
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.dolson.connectfour.SettingsActivity"
+            android:name=".SettingsActivity"
             android:label="@string/app_name" 
             android:screenOrientation="portrait" >
             <intent-filter>
