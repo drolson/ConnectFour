@@ -1,4 +1,4 @@
-package com.dolson.connectfour;
+package com.dolson.attachfour;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -62,7 +62,7 @@ public class Game extends Activity implements Runnable
 	            this.newGame();
 	            return true;
 	        case R.id.settings:
-	        	//TODO: strategies for players (h vs h, h vs c, c vs c) - based on checkboxes???
+	        	//TODO: strategies for players (h vs h, h vs c, c vs c) - based on radiobuttons???
 	        	Intent intent = new Intent(this, SettingsActivity.class);
 	        	intent.putExtra("strat0", board.getPlayer(0).getStrat());
 	        	intent.putExtra("strat1", board.getPlayer(1).getStrat());
@@ -88,14 +88,14 @@ public class Game extends Activity implements Runnable
     	
     	//board info
     	
-    	try
+    	/*try
 		{
 			t.wait();
 		} catch (InterruptedException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
     }
     
     @Override
@@ -110,7 +110,7 @@ public class Game extends Activity implements Runnable
     	board.getPlayer(1).setStrat(state.getInt("strat1"));
     	
     	//board info
-    	t.notify();
+    	//t.notify();
     }
     
     @Override
@@ -188,15 +188,8 @@ public class Game extends Activity implements Runnable
 				System.out.println("trying to invalidate");
 				Game.this.updateHandler.sendEmptyMessage(0);
 			}
-		}
-		
-		//System.out.println("game is now over ");
-		//System.exit(0);
-		
+		}	
 	}
-    
-   
-
 }
 
 

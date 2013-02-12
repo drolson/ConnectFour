@@ -1,6 +1,5 @@
-package com.dolson.connectfour;
+package com.dolson.attachfour;
 
-import com.dolson.attachfour.R;
 import java.util.Random;
 
 /*

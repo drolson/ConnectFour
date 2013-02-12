@@ -1,6 +1,7 @@
-package com.dolson.connectfour;
+package com.dolson.attachfour;
 
-public class ExpertStrategy implements Strategy
+
+public class IntermediateStrategy implements Strategy
 {
 	Board board;
 	Player p;
@@ -17,7 +18,7 @@ public class ExpertStrategy implements Strategy
 	final int debug = 1;
 	private final int mainDepth = 3;
 	
-	public ExpertStrategy(Player p)
+	public IntermediateStrategy(Player p)
 	{
 		this.p = p;
 		board = p.getBoard();
@@ -59,7 +60,7 @@ public class ExpertStrategy implements Strategy
 		}
 	}
 	
-	/*private int minimax(int depth, int player)
+	private int minimax(int depth, int player)
 	{
 		if (depth <= 0) //invalid call to function
 			return -1;
@@ -73,19 +74,19 @@ public class ExpertStrategy implements Strategy
 				
 				addPiece(i, player);
 				if (debug == 1)
-				System.out.println(depth + " trying a piece at: " + i);
+					System.out.println(depth + " trying a piece at: " + i);
 				int value = maximize(depth-1, player+1);
 				if (value > max)
 				{
 					index = i;
 					if (debug == 1)
-					System.out.println("found a good index value: " + index);
+						System.out.println("found a good index value: " + index);
 					max = value;
 				}
 				removePiece(i);
 			}
 			if (debug == 1)
-			System.out.println("depth: " + depth + "     gives us this score: " + max + "     for this index: " + i);
+				System.out.println("depth: " + depth + "     gives us this score: " + max + "     for this index: " + i);
 		}
 		
 		return index;
@@ -152,9 +153,9 @@ public class ExpertStrategy implements Strategy
 		}
 		
 		return min;
-	}*/
+	}
 	
-	private int minimax(int depth, int player)
+	/*private int minimax(int depth, int player)
 	{
 		if (depth <= 0) //invalid call to function
 			return -1;
@@ -168,19 +169,19 @@ public class ExpertStrategy implements Strategy
 				
 				addPiece(i, player);
 				if (debug == 1)
-					System.out.println(depth + " trying a piece at: " + i);
+				System.out.println(depth + " trying a piece at: " + i);
 				int value = maximize(depth-1, player+1);
 				if (value > max)
 				{
 					index = i;
 					if (debug == 1)
-						System.out.println("found a good index value: " + index);
+					System.out.println("found a good index value: " + index);
 					max = value;
 				}
 				removePiece(i);
 			}
 			if (debug == 1)
-				System.out.println("depth: " + depth + "     gives us this score: " + max + "     for this index: " + i);
+			System.out.println("depth: " + depth + "     gives us this score: " + max + "     for this index: " + i);
 		}
 		
 		return index;
@@ -231,7 +232,7 @@ public class ExpertStrategy implements Strategy
 		}
 		
 		return min;
-	}
+	}*/
 	
 	private int winner(int player)
 	{
@@ -300,12 +301,12 @@ public class ExpertStrategy implements Strategy
 			//move = index;
 			move = minimax(mainDepth, myID);
 			if (debug == 1)
-				System.out.println("trying expert move " + move);
+			System.out.println("trying expert move " + move);
 			
 		//} while (board.setSpace(move) == 1);
 			if (board.setSpace(move) == 1)
 				System.exit(0);
 			if (debug == 1)
-					System.out.println("exiting out of settings a piece");
+		System.out.println("exiting out of settings a piece");
 	}
 }

@@ -1,4 +1,4 @@
-package com.dolson.connectfour;
+package com.dolson.attachfour;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -45,7 +45,7 @@ public class Board extends View implements OnClickListener, Runnable
 		
 		this.resetBoard();
 			
-		p0 = new Player("drew", 0, 2, this);
+		p0 = new Player("drew", 0, 0, this);
 		p1 = new Player("test2", 1, 3, this);
 		this.notifyPlayerTurn();
 	}
@@ -69,7 +69,7 @@ public class Board extends View implements OnClickListener, Runnable
 	    	orientedHeight = this.getWidth();
 	    }
 
-	    
+	    System.out.println("this.getWidth()=    " + this.getWidth());
 	    spacing = 2*((float)smallestWidth/actualWidth);
 	    //System.out.println("spacing"+spacing);
 	    diameter = 100*((float)smallestWidth/actualWidth);
@@ -79,7 +79,7 @@ public class Board extends View implements OnClickListener, Runnable
 	   
 	    //System.out.println("total  " + (spacing*14 + diameter*7));
 	   
-	    
+	    //draw currently placed items on the board
 	    for (int row = 1; row <= 6; row++)
 	    {
 	    	for (int i = 0; i < 7; i++)
@@ -113,6 +113,7 @@ public class Board extends View implements OnClickListener, Runnable
 	    	canvas.drawCircle((placeChecker*diameter)+(radius)+(2*placeChecker+1)*spacing, (orientedHeight-(diameter*7))+radius-(10*spacing)-2*spacing, radius, paint);
 	    }
 	    
+	    //if a token is currently dropping then kepp in here til its done
 	    if (dropToken)
 	    {
 	    	int row = getYValue(space);
@@ -126,33 +127,15 @@ public class Board extends View implements OnClickListener, Runnable
 	    		if (!isWinner)
 	    		{
 	    			this.notifyPlayerTurn();
-	    			/*Thread thread = new Thread();
-	    			try
-					{
-	    				while (!dropToken)
-	    				{
-	    					thread.sleep(4000);
-	    				}
-					} catch (InterruptedException e)
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}*/
-	    			this.invalidate();
+	    			//this.invalidate();
 	    		}
-	    		
 	    	}
 	    	
-	    	//System.out.println("invalidating");
-	    	//canvas.drawBitmap(boardImage, 0, orientedHeight - boardImage.getHeight(), paint);
 	    	this.invalidate();
-	    	//System.out.println("success invalidating");
 	    }
 	    
-	    
-	    
+
 	    canvas.drawBitmap(boardImage, null, new Rect(0, (int)(orientedHeight-(actualHeight*((float)smallestWidth/actualWidth))), smallestWidth, orientedHeight), paint);
-	    
 	}
 	
 
@@ -488,45 +471,7 @@ public class Board extends View implements OnClickListener, Runnable
 		for (int i = 0; i < board.length; i++)
 			for (int j = 0; j < board[0].length; j++)
 				board[i][j] = -1;
-		
-		/*board[5][0] = 1;
-		board[4][0] = 1;
-		board[3][0] = 1;
-		board[2][0] = 0;
-		board[1][0] = 1;
-		board[0][0] = 1;
-		
-		board[5][2] = 1;
-		board[4][2] = 1;
-		board[3][2] = 0;
-		board[2][2] = 1;
-		board[1][2] = 0;
-		
-		board[5][3] = 0;
-		board[4][3] = 0;
-		board[3][3] = 0;
-		board[2][3] = 1;
-		//board[1][3] = 0;
-		
-		board[5][4] = 0;
-		board[4][4] = 0;
-		board[3][4] = 1;
-		board[2][4] = 0;
-		
-		board[5][5] = 0;
-		board[4][5] = 0;
-		board[3][5] = 0;
-		board[2][5] = 1;
-		board[1][5] = 0;
-		
-		board[5][6] = 1;
-		board[4][6] = 1;
-		board[3][6] = 0;
-		board[2][6] = 1;*/
-	
-		
-		//board
-		
+				
 		isWinner = false;
 		placeChecker = -1;
 		space = 3;
@@ -554,33 +499,4 @@ public class Board extends View implements OnClickListener, Runnable
 	{
 		
 	}
-
-/*	@Override
-	public void run()
-	{
-		
-		while (!isGameOver() && !dropToken)
-		{
-			try
-			{
-				Thread.sleep(1000);
-			} catch (InterruptedException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			Board.this.findViewById(R.id.main_view).post(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					LinearLayout main = (LinearLayout)Board.this.findViewById(R.id.board_view);
-					main.invalidate();
-				}
-				
-			});
-		}
-	}*/
-	
-	
 }
