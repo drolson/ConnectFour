@@ -15,7 +15,7 @@ public class IntermediateStrategy implements Strategy
 	int lastRow = 0;
 	int lastCol = 0;
 	int index;
-	final int debug = 1;
+	final int debug = 0;
 	private final int mainDepth = 3;
 	
 	public IntermediateStrategy(Player p)
@@ -73,20 +73,14 @@ public class IntermediateStrategy implements Strategy
 			{
 				
 				addPiece(i, player);
-				if (debug == 1)
-					System.out.println(depth + " trying a piece at: " + i);
 				int value = maximize(depth-1, player+1);
 				if (value > max)
 				{
 					index = i;
-					if (debug == 1)
-						System.out.println("found a good index value: " + index);
 					max = value;
 				}
 				removePiece(i);
 			}
-			if (debug == 1)
-				System.out.println("depth: " + depth + "     gives us this score: " + max + "     for this index: " + i);
 		}
 		
 		return index;
@@ -106,8 +100,6 @@ public class IntermediateStrategy implements Strategy
 			{
 				//max = 0;
 				addPiece(i, player%2);
-				if (debug == 1)
-				System.out.println(depth+" trying a piece at: " + i);
 				int value = minimize(depth-1, player+1);
 				//if (value < max)
 				//{
@@ -115,8 +107,6 @@ public class IntermediateStrategy implements Strategy
 				//	max = value;
 				//}
 				max += value;
-				if (debug == 1)
-				System.out.println(depth+" trying a piece at: " + i + "      score: " + max);
 				removePiece(i);
 			}
 		}
@@ -137,8 +127,6 @@ public class IntermediateStrategy implements Strategy
 			if (b[0][i] == -1) //then this could be a valid move
 			{
 				addPiece(i, player%2);
-				if (debug == 1)
-				System.out.println(depth+" trying a piece at: " + i);
 				int value = maximize(depth-1,player+1);
 				if (value > min)
 				{
@@ -146,8 +134,6 @@ public class IntermediateStrategy implements Strategy
 					min = value;
 				}
 				min += value;
-				if (debug == 1)
-				System.out.println(depth+" trying a piece at: " + i + "      score: " + min);
 				removePiece(i);
 			}
 		}
@@ -241,14 +227,10 @@ public class IntermediateStrategy implements Strategy
 		{
 			if (myID != player && player == winner[1]) //block the win
 			{
-				if (debug == 1)
-				System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 				return MIN;
 			}
 			else if (myID == player && player == winner[1]) //take the win
 			{
-				if (debug == 1)
-				System.out.println("possible winner*************************************");
 				return MAX;
 			}
 			//return MAX;
@@ -300,13 +282,9 @@ public class IntermediateStrategy implements Strategy
 			//move = minimax(b, mainDepth, myID);
 			//move = index;
 			move = minimax(mainDepth, myID);
-			if (debug == 1)
-			System.out.println("trying expert move " + move);
 			
 		//} while (board.setSpace(move) == 1);
 			if (board.setSpace(move) == 1)
 				System.exit(0);
-			if (debug == 1)
-		System.out.println("exiting out of settings a piece");
 	}
 }

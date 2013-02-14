@@ -24,11 +24,15 @@ public class Board extends View implements OnClickListener, Runnable
 	private final float dropSpeed = (float)0.25;
 	private float yValue;
 	private boolean dropToken;
+	private boolean droppedTokenSuccess;
 	private boolean isWinner;
 	private int playerTurn;
+	public Rect rect = new Rect(0,0,0,0);
 	float spacing;
 	int smallestWidth;
     int orientedHeight;
+    
+    //height and width of the image so we know how to scale
     float actualWidth = 728;
     float actualHeight = 624;
     
@@ -43,8 +47,10 @@ public class Board extends View implements OnClickListener, Runnable
 	{
 		super(context);
 		
+		board = new int[6][7];
+		
 		this.resetBoard();
-			
+					
 		p0 = new Player("drew", 0, 0, this);
 		p1 = new Player("test2", 1, 3, this);
 		this.notifyPlayerTurn();
@@ -53,9 +59,11 @@ public class Board extends View implements OnClickListener, Runnable
 	@Override
 	protected void onDraw(Canvas canvas) 
 	{
-	    super.onDraw(canvas);
+		//System.out.println("Start drawing: " + System.nanoTime());
+		
+	    //super.onDraw(canvas);
 	    
-
+//System.out.println("Redrawing the image here");
 	    
 	    if (this.getWidth() < this.getHeight())
 	    {
@@ -69,7 +77,7 @@ public class Board extends View implements OnClickListener, Runnable
 	    	orientedHeight = this.getWidth();
 	    }
 
-	    System.out.println("this.getWidth()=    " + this.getWidth());
+	    //System.out.println("this.getWidth()=    " + this.getWidth());
 	    spacing = 2*((float)smallestWidth/actualWidth);
 	    //System.out.println("spacing"+spacing);
 	    diameter = 100*((float)smallestWidth/actualWidth);
@@ -79,30 +87,30 @@ public class Board extends View implements OnClickListener, Runnable
 	   
 	    //System.out.println("total  " + (spacing*14 + diameter*7));
 	   
+	    //long time = System.currentTimeMillis();
 	    //draw currently placed items on the board
 	    for (int row = 1; row <= 6; row++)
 	    {
 	    	for (int i = 0; i < 7; i++)
 	    	{
-	    		// if board = 1 > red
-	    		//if board = 2 > black
-	    		//if board = 0 > white
-	    		if (board[6-row][i] == -1)
-	    			paint.setColor(Color.WHITE);
-	    		else if (board[6-row][i] == 0)
+	    		// if board = 0 > red
+	    		//if board = 1 > black
+	    		//if board = -1 > white -> no player
+	    		if (board[6-row][i] == 0)
+	    		{
 	    			paint.setColor(Color.RED);
+	    			canvas.drawCircle((i*diameter)+(radius)+((i+1)*spacing)+(i*spacing), (orientedHeight-(diameter*row))+radius-((row-1)*spacing*2)-spacing, radius, paint);
+	    		}
+	    			
 	    		else if (board[6-row][i] == 1)
+	    		{
 	    			paint.setColor(Color.BLACK);
-	    		
-	    		//paint.setColor(Color.GREEN);
-	    		
-	    		canvas.drawCircle((i*diameter)+(radius)+((i+1)*spacing)+(i*spacing), (orientedHeight-(diameter*row))+radius-((row-1)*spacing*2)-spacing, radius, paint);	
+	    			canvas.drawCircle((i*diameter)+(radius)+((i+1)*spacing)+(i*spacing), (orientedHeight-(diameter*row))+radius-((row-1)*spacing*2)-spacing, radius, paint);
+	    		}
 	    	}
-	    	//System.out.println(row);
-	    	//canvas.drawBitmap(boardImage, null, new Rect(0, (int)(orientedHeight-(616*((float)smallestWidth/(float)720))), smallestWidth, orientedHeight), paint);
 	    }
-	    
-	    //this will draw the checker that hasnt been dropped but will be when button released
+	    //System.out.println("time for loop: " + (System.currentTimeMillis()-time));
+	    //this will draw the checker that hasnt been dropped but will be when button released (ie: they touched the screen and its at the top of the board)
 	    if (playerTurn == 0)
     		paint.setColor(Color.RED);
     	else
@@ -113,29 +121,33 @@ public class Board extends View implements OnClickListener, Runnable
 	    	canvas.drawCircle((placeChecker*diameter)+(radius)+(2*placeChecker+1)*spacing, (orientedHeight-(diameter*7))+radius-(10*spacing)-2*spacing, radius, paint);
 	    }
 	    
-	    //if a token is currently dropping then kepp in here til its done
+	    //if a token is currently dropping then draw it
 	    if (dropToken)
 	    {
 	    	int row = getYValue(space);
+	    	yValue = yValue - dropSpeed;
 	    	canvas.drawCircle((space*diameter)+(radius)+(2*space+1)*spacing, (orientedHeight-(diameter*yValue))+radius-((5-row)*spacing*2), radius, paint);
 	    	
-	    	yValue = yValue - dropSpeed;
-	    	if (yValue <= (board.length-row))
+	    	if (yValue <= (board.length-row)) //then its reached its landing destination so insert it into the actual board as stationary
 	    	{
 	    		insert(space, playerTurn);
+	    		
 	    		dropToken = false;
 	    		if (!isWinner)
 	    		{
-	    			this.notifyPlayerTurn();
-	    			//this.invalidate();
+	    			//this.notifyPlayerTurn();
+	    			this.droppedTokenSuccess = true;
 	    		}
 	    	}
-	    	
-	    	this.invalidate();
 	    }
+	    rect.left = 0;
+	    rect.top =  (int)(orientedHeight-(actualHeight*((float)smallestWidth/actualWidth)));
+	    rect.right = smallestWidth;
+	    rect.bottom = orientedHeight;
+	    canvas.drawBitmap(boardImage, null, rect, paint);
 	    
-
-	    canvas.drawBitmap(boardImage, null, new Rect(0, (int)(orientedHeight-(actualHeight*((float)smallestWidth/actualWidth))), smallestWidth, orientedHeight), paint);
+		//System.out.println("Draw TIME:  " + (System.currentTimeMillis()-time));
+	    //canvas.drawBitmap(boardImage, null, new Rect(0, (int)(orientedHeight-(actualHeight*((float)smallestWidth/actualWidth))), smallestWidth, orientedHeight), paint);
 	}
 	
 
@@ -168,8 +180,7 @@ public class Board extends View implements OnClickListener, Runnable
 				Toast toast = Toast.makeText(super.getContext(), text, duration);
 				toast.show();
 			}
-		}
-			
+		}	
 	}
 	
 	/*
@@ -327,8 +338,6 @@ public class Board extends View implements OnClickListener, Runnable
 			if (inarow == 4)
 			{
 				isWinner = state;
-				if (debug == 1)
-				System.out.println("is Winner == true");
 			}
 			return matched;
 		}
@@ -359,7 +368,6 @@ public class Board extends View implements OnClickListener, Runnable
 		//if a token is already being dropped, dont let the person change while its dropping
 		//also if there is a winner, don't let there be any more input
 		//also if the computer is playing, we dont get any input
-		//System.out.println(me.getAction());
 		if (!dropToken && !isWinner && this.getPlayer(playerTurn).isHuman())
 		{
 			float xloc = me.getX();
@@ -427,8 +435,6 @@ public class Board extends View implements OnClickListener, Runnable
 				}
 				else
 				{
-					if (debug == 1)
-					System.out.println("placing a piece here   " + i);
 					oldSpace = i;
 					space = i;
 					dropToken = true;
@@ -437,8 +443,6 @@ public class Board extends View implements OnClickListener, Runnable
 			}
 			else
 			{
-				if (debug == 1)
-				System.out.println("not a good move");
 				return 1;
 			}
 				
@@ -451,10 +455,18 @@ public class Board extends View implements OnClickListener, Runnable
 		return space;
 	}
 	
+	public boolean getDroppedTokenSuccess()
+	{
+		return droppedTokenSuccess;
+	}
+	
+	public void setDroppedTokenSuccess(boolean b)
+	{
+		droppedTokenSuccess = b;
+	}
+	
 	protected void notifyPlayerTurn()
 	{
-		if (debug == 1)
-		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 		playerTurn = (playerTurn+1)%2;
 		this.getPlayer(playerTurn).notifyTurn();
 	}
@@ -467,7 +479,7 @@ public class Board extends View implements OnClickListener, Runnable
 	
 	public void resetBoard()
 	{
-		board = new int[6][7];
+		//board = new int[6][7];
 		for (int i = 0; i < board.length; i++)
 			for (int j = 0; j < board[0].length; j++)
 				board[i][j] = -1;
@@ -477,6 +489,7 @@ public class Board extends View implements OnClickListener, Runnable
 		space = 3;
 		dropToken = false;
 		playerTurn = -1;
+		droppedTokenSuccess = false;
 	}
 	
 	public int[][] getBoard()

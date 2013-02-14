@@ -18,6 +18,8 @@ public class Game extends Activity implements Runnable
 	private Board board;
 	private MenuInflater mi;
 	Thread t;
+	private long lastNano = 0;
+	private long timeLeftMillis = 0;
 	
 	
     /** Called when the activity is first created. */
@@ -28,6 +30,7 @@ public class Game extends Activity implements Runnable
         
         board = new Board(this);
         new Thread(board).start();
+        //this.runOnUiThread(board);
         
         //set the players names along with the colors that they are
         TextView tv1 = (TextView)findViewById(R.id.player1);
@@ -38,7 +41,7 @@ public class Game extends Activity implements Runnable
         LinearLayout main = (LinearLayout)findViewById(R.id.board_view);
         main.addView(board);
         board.setOnClickListener(board);
-        
+        lastNano = System.nanoTime();
         t = new Thread(this);
         t.start();
     }
@@ -143,6 +146,7 @@ public class Game extends Activity implements Runnable
     			}
     		}
     		
+    		// if they changed the settings for a player, then we should start a new game since a new player is playing
     		if (i.getExtras().getBoolean("p0bool") || i.getExtras().getBoolean("p1bool"))
     		{
     			this.newGame();
@@ -153,15 +157,18 @@ public class Game extends Activity implements Runnable
     private void newGame()
     {
 		board.resetBoard();
+		t = new Thread(this);
+		t.start();
 		board.invalidate();
 		board.notifyPlayerTurn();
     }
     
     public Handler updateHandler = new Handler(){
-        /** Gets called on every message that is received */
+        //** Gets called on every message that is received *//*
         // @Override
         public void handleMessage(Message msg) {
             //board.update();
+        	System.out.println("This is in the handler");
             board.invalidate();
             super.handleMessage(msg);
         }
@@ -173,22 +180,36 @@ public class Game extends Activity implements Runnable
 	{
 		while (!board.isGameOver())
 		{
-			
 			try
 			{
-				Thread.sleep(1000);
+				//try to maintain 60 frames per second
+				timeLeftMillis = (16666666 - (System.nanoTime()-lastNano))/1000000;
+				System.out.println("Sleeping for " + timeLeftMillis);
+				if (timeLeftMillis > 0)
+					Thread.sleep(timeLeftMillis);
+				System.out.println("Finished sleeping " + System.nanoTime());
+				lastNano = System.nanoTime();
+			
 			} catch (InterruptedException e)
 			{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
-			if (board.getDropToken())
+			if (board.getDropToken()) //ie: we are dropping a token so all we do is redraw til its dropped
 			{
 				System.out.println("trying to invalidate");
 				Game.this.updateHandler.sendEmptyMessage(0);
+				System.out.println("Sent to update Handler " + System.nanoTime());
 			}
-		}	
+			
+			if (board.getDroppedTokenSuccess()) //then we have finished dropping a token and we can finally notify the next player
+			{
+				board.setDroppedTokenSuccess(false);
+				board.notifyPlayerTurn();
+			}
+			
+		}
 	}
 }
 
